@@ -187,12 +187,56 @@
       .rowflex{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
       .loading{padding:60px 0;text-align:center;color:var(--muted);}
 
-      /* Ledger tables retained for any table markup: at 393px they scroll
-         horizontally ONLY inside .tablebox, first column sticky — page itself never scrolls sideways. */
-      .tablebox{border:1px solid var(--line);background:var(--paper);border-radius:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-      table.ledger{border-collapse:collapse;width:100%;table-layout:fixed;}
-      table.ledger th,table.ledger td{border-bottom:1px solid var(--line-soft);border-right:1px solid var(--line-soft);padding:6px 2px;text-align:center;font-size:.82rem;}
-      table.ledger td.person,table.ledger th.person{position:sticky;left:0;background:var(--paper);text-align:left;padding-left:8px;width:92px;z-index:1;}
+      /* Ledger tables — Today & Week: paper-ledger, flat 1px rules.
+         The table scrolls horizontally ONLY inside .tablebox (page itself
+         never scrolls sideways); first column (person) stays sticky. */
+      .tablebox{border:1px solid var(--line);background:var(--paper);border-radius:6px;
+        overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;max-width:100%;margin-bottom:10px;}
+      .tablebox:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+      table.ledger{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;}
+      table.ledger th,table.ledger td{border-bottom:1px solid var(--line-soft);border-right:1px solid var(--line-soft);
+        padding:7px 4px;text-align:center;font-size:.84rem;line-height:1.25;min-width:38px;height:48px;vertical-align:middle;background:var(--paper);}
+      table.ledger tr:last-child td{border-bottom:none;}
+      table.ledger th:last-child,table.ledger td:last-child{border-right:none;}
+      table.ledger thead th{background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;
+        letter-spacing:.02em;padding:8px 4px;height:auto;white-space:nowrap;}
+      table.ledger thead th small{display:block;font-weight:400;font-size:.68rem;opacity:.85;letter-spacing:0;}
+      table.ledger td.done-cell{background:var(--accent-soft);}
+      table.ledger td.total,table.ledger th.total{min-width:58px;background:var(--accent-soft);font-weight:700;color:var(--accent);}
+      table.ledger thead th.total{background:var(--accent);color:#fff;}
+      table.ledger th.person,table.ledger td.person{position:sticky;left:0;text-align:left;
+        min-width:118px;max-width:132px;width:118px;padding:6px 8px;border-right:1px solid var(--line);}
+      table.ledger td.person{background:var(--paper);z-index:2;}
+      table.ledger thead th.person{background:var(--accent);color:#fff;z-index:3;}
+      .person-btn{display:block;width:100%;background:none;border:none;border-radius:0;padding:0;min-height:0;
+        text-align:left;font-weight:700;font-size:.92rem;line-height:1.2;color:var(--ink);cursor:pointer;white-space:normal;}
+      .person-btn:active{background:none;color:var(--accent);}
+      .person-sub{display:block;font-size:.7rem;color:var(--muted);font-weight:400;line-height:1.25;margin-top:2px;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .total-sub{display:block;font-size:.7rem;font-weight:400;color:var(--muted);margin-top:1px;}
+      table.ledger td.total .total-sub{color:var(--muted);}
+      .scroll-hint{font-size:.8rem;color:var(--muted);margin:-4px 0 10px;line-height:1.4;}
+
+      /* Today vs Week — distinct headers + per-person done / not-done status */
+      .viewtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+        padding:3px 8px;border-radius:4px;}
+      .viewtag.today{background:var(--accent);color:#fff;}
+      .viewtag.week{background:var(--paper);color:var(--accent);border:1px solid var(--accent);}
+      .statusbox{border:1px solid var(--line);background:var(--paper);border-radius:6px;overflow:hidden;margin-bottom:6px;}
+      .status-row{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;
+        border-bottom:1px solid var(--line-soft);padding:9px 12px;min-height:52px;text-align:left;border-radius:0;}
+      .status-row:last-child{border-bottom:none;}
+      button.status-row:active{background:var(--accent-soft);}
+      .status-row .avatar{width:36px;height:36px;font-size:.95rem;flex:none;}
+      .status-name{flex:1;min-width:0;font-weight:600;font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .status-name small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;white-space:normal;}
+      .status-pill{flex:none;font-size:.8rem;font-weight:700;padding:4px 8px;border-radius:4px;border:1px solid var(--line);text-align:center;}
+      .status-pill.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+      .status-pill.part{background:var(--accent-soft);color:var(--accent);}
+      .status-pill.none{background:var(--paper);color:var(--muted);}
+      .status-pill.missed{background:var(--paper);color:var(--red);border-color:var(--red);}
+      .tabbar-in.cols3{grid-template-columns:repeat(3,1fr);}
+      .namelist .sub{display:block;font-size:.78rem;color:var(--muted);font-weight:400;margin-top:1px;}
       @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
     </style>
   </head>
@@ -206,8 +250,11 @@
     /* ============ Configuration ============ */
     var SUPABASE_URL = "https://fiixgsjfjcisqjxgqfvu.supabase.co";
     var SUPABASE_KEY = "sb_publishable_xHx91jPBByJ0C0lNV8I0Ag_tc1AoVWo";
-    var PEOPLE = ["Tahsim Abi","Atiq Abi","Husein Abi","Fikri Abi","Hamid Abi"];
-    var ADMIN_PERSON = "Fikri Abi";
+    var PEOPLE = ["Tahsim Abi","Atiq Abi","Husein Abi","Fikri Abi","Hamid Abi","Admin"];
+    var ADMIN_PERSON = "Admin";
+    /* The 5 members who have checklists. Admin is oversight only — no
+       checklist, and never a row in the Today / Week tables or Export. */
+    var MEMBERS = ["Tahsim Abi","Atiq Abi","Husein Abi","Fikri Abi","Hamid Abi"];
 
     /* ============ Items ============ */
     /* due: "daily" | "week" (any day this week) | "fri" | "sat-sun" | "month" | "first-wed" */
@@ -458,6 +505,55 @@
       if(ds<dstr(today)) return {cls:"missed", txt:"\u2014"};
       return {cls:"", txt:""};
     }
+    /* Per-item mark for the Today ledger: person x item cells. */
+    function itemMark(person,dateObj,item){
+      var ds=dstr(dateObj), r=getCI(person,ds,item.id);
+      var isPast = ds<dstr(new Date());
+      if(!r) return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+      if(item.target){
+        var c=r.count||0;
+        if(r.done || c>=item.target) return {cls:"done-mark", txt:"\u2713"};
+        if(c>0) return {cls:"partial", txt:c+"/"+item.target};
+        return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+      }
+      if(r.done) return {cls:"done-mark", txt:"\u2713"};
+      return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+    }
+    function personCell(p,subText){
+      return '<td class="person"><button class="person-btn" data-act="open-person" data-p="'+esc(p)+'">'+
+        esc(p)+(p===state.me?" \u00b7 You":"")+'</button>'+
+        (subText?'<span class="person-sub">'+esc(subText)+"</span>":"")+"</td>";
+    }
+
+    /* Has this member done the day / the week, or not? Plain status per person,
+       so the Admin (and everyone) can see it without reading the table cells. */
+    function dayStatus(person,dateObj){
+      var st=dayStats(person,dateObj);
+      if(st.total && st.frac>=1) return {cls:"done", label:"\u2713 Done", detail:st.done+"/"+st.total+" items done"};
+      if(st.frac>0) return {cls:"part", label:"Started", detail:st.done+"/"+st.total+" items done so far"};
+      if(dstr(dateObj)<dstr(new Date())) return {cls:"missed", label:"Not done", detail:"Nothing recorded"};
+      return {cls:"none", label:"Not yet", detail:"Nothing recorded yet"};
+    }
+    function weekStatus(person,ws){
+      var frac=0, fullDays=0, any=false, i, s;
+      for(i=0;i<7;i++){ s=dayStats(person,addDays(ws,i)); frac+=s.frac; if(s.frac>0) any=true; if(s.total && s.frac>=1) fullDays++; }
+      var pct=Math.round(frac/7*100);
+      if(pct>=100) return {cls:"done", label:"\u2713 Done", detail:"All 7 days complete"};
+      if(any) return {cls:"part", label:pct+"%", detail:fullDays+" of 7 days fully done"};
+      if(dstr(addDays(ws,6))<dstr(new Date())) return {cls:"missed", label:"Not done", detail:"Nothing recorded this week"};
+      return {cls:"none", label:"Not yet", detail:"Nothing recorded this week"};
+    }
+    function statusBox(mode, refDate){
+      var h='<div class="statusbox" aria-label="'+(mode==="week"?"Who has done this week":"Who has done today")+'">';
+      MEMBERS.forEach(function(p){
+        var s = mode==="week" ? weekStatus(p,refDate) : dayStatus(p,refDate);
+        h+='<button class="status-row" data-act="open-person" data-p="'+esc(p)+'">'+
+          '<span class="avatar" aria-hidden="true">'+esc(p.charAt(0))+'</span>'+
+          '<span class="status-name">'+esc(p)+(p===state.me?" \u00b7 You":"")+'<small>'+esc(s.detail)+'</small></span>'+
+          '<span class="status-pill '+s.cls+'">'+esc(s.label)+'</span></button>';
+      });
+      return h+"</div>";
+    }
 
     /* ============ Rendering ============ */
     var app=document.getElementById("app");
@@ -467,6 +563,12 @@
         esc(state.bootError)+'</p><p><button data-act="reload">Try again</button></p></div></div>'; return; }
       if(!state.me){ app.innerHTML = setupView(); return; }
       if(state.me!==ADMIN_PERSON){ state.admin=false; state.adminPanel=false; }
+      if(state.me===ADMIN_PERSON){
+        /* Admin has no checklist of its own: never land on "mine", and never
+           open a person page for Admin itself. */
+        if(state.view==="mine") state.view="today";
+        if(state.view==="person" && state.personView===ADMIN_PERSON) state.view="today";
+      }
       var h = topbar();
       h += '<div class="wrap">';
       if(!state.online || state.queue.length) h += offlineBanner();
@@ -499,8 +601,11 @@
         ["export","Export",'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>']
       ];
       var cur = state.view==="person" ? (state.personView===state.me?"mine":"today") : state.view;
-      var h='<nav class="tabbar" aria-label="Main"><div class="tabbar-in">';
-      tabs.forEach(function(tb){
+      var isAdmin = state.me===ADMIN_PERSON;
+      /* Admin oversees only: no Checklist tab, because Admin has no checklist. */
+      var visible = tabs.filter(function(tb){ return !(isAdmin && tb[0]==="mine"); });
+      var h='<nav class="tabbar" aria-label="Main"><div class="tabbar-in'+(isAdmin?" cols3":"")+'">';
+      visible.forEach(function(tb){
         h+='<button data-act="tab" data-v="'+tb[0]+'" class="'+(cur===tb[0]?"active":"")+'" aria-current="'+(cur===tb[0]?"page":"false")+'">'+tb[2]+'<span>'+tb[1]+'</span></button>';
       });
       return h+"</div></nav>";
@@ -528,33 +633,39 @@
       return h;
     }
 
-    /* --- Today --- */
+    /* --- Today — ledger table: persons (sticky first column) x items due --- */
     function todayView(){
       var d=state.selDate, ds=dstr(d), items=dueItems(d);
       var h=dateNav();
-      h+="<h2 class=\"sec\">Everyone today</h2>";
-      PEOPLE.forEach(function(p){
-        var st=dayStats(p,d);
-        var pct=st.total?Math.round(st.frac*100):0;
-        h+='<section class="pcard"><button class="pcard-head" data-act="open-person" data-p="'+esc(p)+'">'+
-          '<span class="avatar">'+esc(p.charAt(0))+'</span>'+
-          '<span class="pcard-meta"><b>'+esc(p)+(p===state.me?" · You":"")+'</b><span>'+(state.lastUpdated[p]?"Updated "+fmtTime(state.lastUpdated[p]):"No entries yet")+'</span></span>'+
-          '<span class="pct-pill'+(pct===0?" low":"")+'">'+pct+'%</span></button>';
-        h+='<div class="progress" aria-hidden="true"><i style="width:'+pct+'%"></i></div>';
-        h+='<div class="chips">';
-        items.forEach(function(it){
-          var r=getCI(p,ds,it.id);
-          var doneIt = r && (r.done || (it.target && (r.count||0)>=it.target));
-          var part = r && it.target && (r.count||0)>0 && !doneIt;
-          var label = doneIt ? "\u2713" : (part ? r.count+"/"+it.target : (ds<dstr(new Date()) ? "\u2014" : "\u00b7"));
-          var cls = doneIt ? "chip done" : (part ? "chip part" : "chip");
-          if(!doneIt && !part && ds<dstr(new Date())) cls+=" missed-chip";
-          h+='<div class="'+cls+'"><b>'+it.code+'</b><span class="'+(ds<dstr(new Date())&&!r?"missed":"")+'">'+label+'</span></div>';
+      h+='<div style="margin-top:12px;"><span class="viewtag today">Today \u00b7 one day</span></div>';
+      h+="<h2 class=\"sec\" style=\"margin-top:6px;\">Who has done today?</h2>";
+      h+='<p class="note" style="margin:-4px 0 10px;">Status for '+fmtDate(d)+' only. For the whole week, open the Week tab.</p>';
+      h+=statusBox("today", d);
+      h+="<h2 class=\"sec\">Detail \u2014 item by item</h2>";
+      if(!items.length){
+        h+='<div class="empty">No items due on this day.</div>';
+      }else{
+        h+='<div class="tablebox" tabindex="0" role="region" aria-label="Today ledger table — scroll sideways inside the table for all items"><table class="ledger"><thead><tr><th class="person" scope="col">Person</th>';
+        items.forEach(function(it){ h+='<th scope="col">'+esc(it.code)+"</th>"; });
+        h+='<th class="total" scope="col">Total</th></tr></thead><tbody>';
+        MEMBERS.forEach(function(p){
+          var st=dayStats(p,d);
+          var pct=st.total?Math.round(st.frac*100):0;
+          h+="<tr>"+personCell(p, state.lastUpdated[p]?"Updated "+fmtTime(state.lastUpdated[p]):"No entries yet");
+          items.forEach(function(it){
+            var m=itemMark(p,d,it);
+            h+='<td class="'+(m.cls==="done-mark"?"done-cell":"")+'"><span class="'+m.cls+'">'+esc(m.txt)+"</span></td>";
+          });
+          h+='<td class="total">'+pct+'%<span class="total-sub">'+st.done+"/"+st.total+" done</span></td></tr>";
         });
-        h+='</div></section>';
-      });
+        h+="</tbody></table></div>";
+        if(items.length>5) h+='<p class="scroll-hint">Scroll sideways inside the table to see all items. Tap a name to open that person\u2019s checklist.</p>';
+      }
       h+='<p class="legend">'+items.map(function(it){return "<b>"+it.code+"</b> "+esc(it.name);}).join(" \u00b7 ")+"</p>";
-      h+='<p class="cta"><button class="primary" data-act="tab" data-v="mine">Open my checklist</button></p>';
+      if(state.me===ADMIN_PERSON)
+        h+='<p class="cta"><button class="primary" data-act="tab" data-v="week">See this week</button></p>';
+      else
+        h+='<p class="cta"><button class="primary" data-act="tab" data-v="mine">Open my checklist</button></p>';
       h+="<h2 class=\"sec\">Recent activity</h2>";
       if(!state.activity.length) h+='<div class="empty">No activity yet. Completed items will appear here.</div>';
       else{
@@ -622,6 +733,10 @@
       h+="<h2 class=\"sec\">"+esc(p)+"</h2>";
       h+='<p class="note" style="margin-top:-4px;">'+(state.lastUpdated[p]?"Last updated "+fmtTime(state.lastUpdated[p]):"No entries yet")+
          (editable?"":" \u00b7 Read-only")+"</p>";
+      if(state.me===ADMIN_PERSON)
+        h+='<p class="note" style="margin-top:-2px;">'+(state.admin
+          ? "Admin mode is on \u2014 changes you make here are saved as corrections."
+          : "Admin mode is off \u2014 this checklist is read-only. Turn Admin on (top right) to correct an entry.")+"</p>";
       h+="<h2 class=\"sec\">Last 7 days</h2>";
       h+='<div class="strip">';
       for(var i=6;i>=0;i--){
@@ -635,30 +750,39 @@
       return h;
     }
 
-    /* --- Week --- */
+    /* --- Week — ledger table: persons (sticky first column) x days --- */
     function weekView(){
       var ws=state.weekStart;
       var h='<div class="datenav"><button class="navbtn" data-act="prev-week" aria-label="Previous week">\u2039</button>'+
         '<div class="center"><span class="date">Week of '+ws.getDate()+" "+MON_S[ws.getMonth()]+'</span><span class="sub">'+fmtDate(ws)+" \u2013 "+fmtDate(addDays(ws,6))+'</span></div>'+
         '<button class="navbtn" data-act="next-week" aria-label="Next week">\u203a</button></div>';
-      PEOPLE.forEach(function(p){
+      h+='<div style="margin-top:12px;"><span class="viewtag week">Week \u00b7 7 days</span></div>';
+      h+="<h2 class=\"sec\" style=\"margin-top:6px;\">Who has done this week?</h2>";
+      h+='<p class="note" style="margin:-4px 0 10px;">Status for the whole week, '+fmtDate(ws)+" \u2013 "+fmtDate(addDays(ws,6))+'. For a single day, open the Today tab.</p>';
+      h+=statusBox("week", ws);
+      h+="<h2 class=\"sec\">Detail \u2014 day by day</h2>";
+      h+='<div class="tablebox" tabindex="0" role="region" aria-label="Week ledger table"><table class="ledger ledger-week"><thead><tr><th class="person" scope="col">Person</th>';
+      for(var i=0;i<7;i++){ var dh=addDays(ws,i);
+        h+='<th scope="col">'+DOW_S[i]+"<small>"+dh.getDate()+" "+MON_S[dh.getMonth()]+"</small></th>"; }
+      h+='<th class="total" scope="col">Week</th></tr></thead><tbody>';
+      MEMBERS.forEach(function(p){
         var totFrac=0;
         for(var k=0;k<7;k++) totFrac+=dayStats(p,addDays(ws,k)).frac;
         var pct=Math.round(totFrac/7*100);
-        h+='<section class="wcard"><button class="pcard-head" data-act="open-person" data-p="'+esc(p)+'">'+
-          '<span class="avatar">'+esc(p.charAt(0))+'</span><span class="pcard-meta"><b>'+esc(p)+'</b><span>Tap to open checklist</span></span><span class="pct-pill'+(pct===0?" low":"")+'">'+pct+'%</span></button>';
-        h+='<div class="progress"><i style="width:'+pct+'%"></i></div><div class="wgrid">';
-        for(var i=0;i<7;i++){ var d2=addDays(ws,i), m=cellMark(p,d2);
-          h+='<div class="wcell"><b>'+DOW_S[i]+' '+d2.getDate()+'</b><span class="'+m.cls+'">'+(m.txt||"\u00b7")+'</span></div>'; }
-        h+='</div></section>';
+        h+="<tr>"+personCell(p, state.lastUpdated[p]?"Updated "+fmtTime(state.lastUpdated[p]):"No entries yet");
+        for(var j=0;j<7;j++){ var d2=addDays(ws,j), m=cellMark(p,d2);
+          h+='<td class="'+(m.cls==="done-mark"?"done-cell":"")+'"><span class="'+m.cls+'">'+esc(m.txt||"\u00b7")+"</span></td>"; }
+        h+='<td class="total">'+pct+"%</td></tr>";
       });
+      h+="</tbody></table></div>";
+      h+='<p class="scroll-hint">Tap a name to open that person\u2019s checklist.</p>';
       h+='<p class="note" style="padding:0 4px;">\u2713 = all items done that day. A fraction such as 9/17 = items done out of items due. \u2014 in red = a past day with nothing recorded.</p>';
       h+='<p class="cta"><button class="primary" data-act="export-xlsx">Export this week to Excel</button></p>';
       return h;
     }
     function exportView(){
       return "<h2 class=\"sec\">Export</h2>"+
-        '<div class="empty" style="color:var(--ink);">Downloads the weekly table (persons \u00d7 days, with the weekly percentage) '+
+        '<div class="empty" style="color:var(--ink);">Downloads the weekly table (the 5 members \u00d7 days, with the weekly percentage) '+
         "for the week of "+fmtDate(state.weekStart)+' as an Excel file.<br><br>'+
         '<button class="primary" data-act="export-xlsx">Export weekly table to Excel</button></div>';
     }
@@ -668,7 +792,7 @@
       for(i=0;i<7;i++){ dd=addDays(ws,i); head.push(DOW_S[i]+" "+dd.getDate()+" "+MON_S[dd.getMonth()]); }
       head.push("Weekly %");
       var rows=[head];
-      PEOPLE.forEach(function(p){
+      MEMBERS.forEach(function(p){
         var row=[p], tot=0;
         for(var i=0;i<7;i++){ var d2=addDays(ws,i), m=cellMark(p,d2);
           tot+=dayStats(p,d2).frac;
@@ -695,11 +819,11 @@
     /* --- Admin panel --- */
     function adminPanel(){
       if(state.me!==ADMIN_PERSON) return "";
-      return '<div class="modal"><h3>Admin \u2014 '+esc(ADMIN_PERSON)+'</h3>'+
+      return '<div class="modal"><h3>Admin</h3>'+
         (state.admin
-          ? '<p class="note" style="margin:0 0 8px;">Admin mode is on for '+esc(ADMIN_PERSON)+', the only admin. Open any person and any day: edits you make to someone else\u2019s checklist are saved as corrections and recorded in the activity feed.</p>'+
+          ? '<p class="note" style="margin:0 0 8px;">Admin mode is on. This Admin profile is the only admin \u2014 Fikri Abi and the others are regular members. Admin has no checklist of its own; it only oversees the 5 members. Open any person and any day: edits you make to someone else\u2019s checklist are saved as corrections and recorded in the activity feed.</p>'+
             '<div class="rowflex"><button data-act="admin-off">Turn admin off</button></div>'
-          : '<p class="note" style="margin:0 0 8px;">Admin is reserved for '+esc(ADMIN_PERSON)+' only. Enter the admin PIN to correct a past entry. If no admin PIN has been set yet, the PIN you enter becomes the admin PIN.</p>'+
+          : '<p class="note" style="margin:0 0 8px;">Only this Admin profile can correct entries. Enter the admin PIN to correct a past entry. If no admin PIN has been set yet, the PIN you enter becomes the admin PIN.</p>'+
             '<form id="admin-form" class="rowflex"><input name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="4-digit PIN" autocomplete="off" style="width:150px;">'+
             '<button class="primary" type="submit">Continue</button></form>')+
         '<div class="err" id="admin-err"></div></div>';
@@ -711,13 +835,13 @@
         "<p>Choose your name and enter your 4-digit PIN. First time? The PIN you enter becomes your PIN for this name. This device remembers you — your checklist is shared live with the group.</p>"+
         '<div class="namelist" role="listbox" aria-label="Choose your name">';
       PEOPLE.forEach(function(p){
-        h+='<button data-act="pick-name" data-p="'+esc(p)+'" class="'+(state.setupName===p?"sel":"")+'" aria-selected="'+(state.setupName===p)+'"><span>'+esc(p)+'</span></button>';
+        h+='<button data-act="pick-name" data-p="'+esc(p)+'" class="'+(state.setupName===p?"sel":"")+'" aria-selected="'+(state.setupName===p)+'"><span>'+esc(p)+(p===ADMIN_PERSON?'<span class="sub">Oversight only \u2014 no checklist</span>':"")+'</span></button>';
       });
       h+='</div><form id="setup-form"><div class="pinrow">'+
          '<input id="setup-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="\u2022 \u2022 \u2022 \u2022" autocomplete="off" enterkeyhint="go" aria-label="4-digit PIN">'+
          '<button class="primary" type="submit">Continue</button></div>'+
          '<div class="err">'+esc(state.setupMsg)+"</div></form>"+
-         '<p class="note" style="text-align:center;margin-top:auto;padding-top:24px;">5 people \u00b7 Shared live \u00b7 Admin: Fikri Abi only</p></div>';
+         '<p class="note" style="text-align:center;margin-top:auto;padding-top:24px;">5 members + Admin \u00b7 Shared live \u00b7 Admin oversees only, no checklist</p></div>';
       return h;
     }
 
@@ -732,7 +856,9 @@
       else if(act==="goto-today"){ state.selDate=new Date(); ensureRange(state.selDate).then(render); render(); }
       else if(act==="prev-week"){ state.weekStart=addDays(state.weekStart,-7); ensureRange(state.weekStart).then(render); render(); }
       else if(act==="next-week"){ state.weekStart=addDays(state.weekStart,7); ensureRange(state.weekStart).then(render); render(); }
-      else if(act==="open-person"){ state.personView=el.getAttribute("data-p"); state.view="person"; render(); }
+      else if(act==="open-person"){ var pp=el.getAttribute("data-p");
+        if(pp===ADMIN_PERSON){ state.view="today"; render(); return; }
+        state.personView=pp; state.view="person"; render(); }
       else if(act==="pick-name"){ state.setupName=el.getAttribute("data-p"); state.setupMsg=""; render(); var inp=document.getElementById("setup-pin"); if(inp) inp.focus(); }
       else if(act==="switch"){ try{localStorage.removeItem("ibadah-identity");}catch(err){}
         state.me=null; state.admin=false; state.setupName=null; state.setupMsg=""; render(); }
