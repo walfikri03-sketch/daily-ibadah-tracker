@@ -167,6 +167,7 @@
     var SUPABASE_URL = "https://fiixgsjfjcisqjxgqfvu.supabase.co";
     var SUPABASE_KEY = "sb_publishable_xHx91jPBByJ0C0lNV8I0Ag_tc1AoVWo";
     var PEOPLE = ["Tahsim Abi","Atiq Abi","Husein Abi","Fikri Abi","Hamid Abi"];
+    var ADMIN_PERSON = "Fikri Abi";
 
     /* ============ Items ============ */
     /* due: "daily" | "week" (any day this week) | "fri" | "sat-sun" | "month" | "first-wed" */
@@ -331,7 +332,7 @@
     }
 
     /* ============ Editing ============ */
-    function canEdit(person){ return state.me===person || state.admin; }
+    function canEdit(person){ return state.me===person || (state.admin && state.me===ADMIN_PERSON); }
     function oldValText(row,item){
       if(!row) return "not done";
       if(item.target) return (row.count||0)+"/"+item.target;
@@ -360,7 +361,7 @@
         target:target, updated_at:new Date().toISOString()}});
       /* Activity entry */
       var action;
-      if(state.admin && person!==state.me){
+      if(state.admin && state.me===ADMIN_PERSON && person!==state.me){
         action="corrected";
         ops.push({table:"activity", method:"insert", payload:{
           person:state.me, item_name:item.name+" (for "+person+", "+date+")", action:"corrected"}});
@@ -425,6 +426,7 @@
       if(state.bootError){ app.innerHTML = '<div class="wrap"><div class="banner"><h2>Could not connect</h2><p>'+
         esc(state.bootError)+'</p><p><button data-act="reload">Try again</button></p></div></div>'; return; }
       if(!state.me){ app.innerHTML = setupView(); return; }
+      if(state.me!==ADMIN_PERSON){ state.admin=false; state.adminPanel=false; }
       var h = topbar();
       h += '<div class="wrap">';
       if(!state.online || state.queue.length) h += offlineBanner();
@@ -453,7 +455,7 @@
       var h='<div class="topbar"><div class="topbar-in">';
       h+='<span class="who">Signed in as <strong>'+esc(state.me)+'</strong></span>';
       h+='<span class="spacer"></span>';
-      h+='<button data-act="admin" class="'+(state.admin?"admin-on":"")+'">'+(state.admin?"Admin on":"Admin")+"</button>";
+      if(state.me===ADMIN_PERSON) h+='<button data-act="admin" class="'+(state.admin?"admin-on":"")+'">'+(state.admin?"Admin on":"Admin")+"</button>";
       h+='<button data-act="switch">Switch user</button>';
       h+="</div>";
       h+='<div class="topbar-in" style="padding-top:0;"><nav class="tabs" style="flex:1;">';
@@ -645,11 +647,12 @@
 
     /* --- Admin panel --- */
     function adminPanel(){
-      return '<div class="modal"><h3>Admin</h3>'+
+      if(state.me!==ADMIN_PERSON) return "";
+      return '<div class="modal"><h3>Admin \u2014 '+esc(ADMIN_PERSON)+'</h3>'+
         (state.admin
-          ? '<p class="note" style="margin:0 0 8px;">Admin mode is on. Open any person and any day: edits you make to someone else\u2019s checklist are saved as corrections and recorded in the activity feed.</p>'+
+          ? '<p class="note" style="margin:0 0 8px;">Admin mode is on for '+esc(ADMIN_PERSON)+', the only admin. Open any person and any day: edits you make to someone else\u2019s checklist are saved as corrections and recorded in the activity feed.</p>'+
             '<div class="rowflex"><button data-act="admin-off">Turn admin off</button></div>'
-          : '<p class="note" style="margin:0 0 8px;">Enter the admin PIN to correct a past entry. If no admin PIN has been set yet, the PIN you enter becomes the admin PIN.</p>'+
+          : '<p class="note" style="margin:0 0 8px;">Admin is reserved for '+esc(ADMIN_PERSON)+' only. Enter the admin PIN to correct a past entry. If no admin PIN has been set yet, the PIN you enter becomes the admin PIN.</p>'+
             '<form id="admin-form" class="rowflex"><input name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="4-digit PIN" autocomplete="off" style="width:150px;">'+
             '<button class="primary" type="submit">Continue</button></form>')+
         '<div class="err" id="admin-err"></div></div>';
@@ -685,7 +688,7 @@
       else if(act==="pick-name"){ state.setupName=el.getAttribute("data-p"); state.setupMsg=""; render(); var inp=document.getElementById("setup-pin"); if(inp) inp.focus(); }
       else if(act==="switch"){ try{localStorage.removeItem("ibadah-identity");}catch(err){}
         state.me=null; state.admin=false; state.setupName=null; state.setupMsg=""; render(); }
-      else if(act==="admin"){ state.adminPanel=!state.adminPanel; render(); }
+      else if(act==="admin"){ if(state.me!==ADMIN_PERSON){ state.admin=false; state.adminPanel=false; render(); return; } state.adminPanel=!state.adminPanel; render(); }
       else if(act==="admin-off"){ state.admin=false; state.adminPanel=false; render(); }
       else if(act==="export-xlsx"){ doExport(); }
       else if(act==="toggle"||act==="inc"||act==="dec"||act==="incby"){
@@ -725,6 +728,7 @@
       }
       if(e.target.id==="admin-form"){
         e.preventDefault();
+        if(state.me!==ADMIN_PERSON){ state.admin=false; state.adminPanel=false; render(); return; }
         var pin=(e.target.querySelector("input[name=pin]").value||"").trim();
         var errEl=document.getElementById("admin-err");
         if(!/^\d{4}$/.test(pin)){ errEl.textContent="Enter a 4-digit PIN."; return; }
@@ -747,6 +751,7 @@
     });
     function finishSetup(person){
       state.me=person;
+      if(person!==ADMIN_PERSON){ state.admin=false; state.adminPanel=false; }
       try{ localStorage.setItem("ibadah-identity", JSON.stringify({person:person})); }catch(e){}
       state.view="today"; state.setupMsg="";
       ensureRange(new Date()).then(render); render();
