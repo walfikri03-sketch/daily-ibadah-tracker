@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#FAF8F4" />
+    <meta name="theme-color" content="#00262B" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="format-detection" content="telephone=no" />
@@ -14,12 +14,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
 <style>
-      /* Paper-ledger look, laid out for iPhone 14 Pro: 393x852 CSS px,
-         Dynamic Island top inset + home-indicator bottom inset via env(). */
+      /* Northpoint-style look: Jet Black #00262B, Light Cyan #CDE3E6,
+         Light Green #ABFFAE. Clean and minimal — flat rectangular buttons,
+         thin borders, generous spacing, no shadows, no gradients.
+         Layout still sized for iPhone 14 Pro: 393x852 CSS px, Dynamic Island
+         top inset + home-indicator bottom inset via env(). */
       :root{
-        --bg:#FAF8F4; --paper:#FFFFFF; --ink:#1B1B1B; --muted:#6E675C;
-        --line:#DCD6CB; --line-soft:#E7E2D8; --accent:#1F5F4A; --accent-soft:#EAF1ED;
-        --red:#B3261E; --amber-bg:#FBF3E2;
+        --bg:#FFFFFF; --paper:#FFFFFF; --ink:#00262B; --muted:#527075;
+        --dark:#00262B; --cyan:#CDE3E6; --cyan-soft:#EFF6F7; --green:#ABFFAE; --green-soft:#EBFFEC;
+        --line:#00262B; --line-soft:#CDE3E6;
+        --accent:#00262B; --accent-soft:#CDE3E6;
+        --red:#B3261E; --amber-bg:#EFF6F7;
         --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
         --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
         color-scheme:light;
@@ -28,119 +33,128 @@
       html{-webkit-text-size-adjust:100%;}
       body{margin:0;background:var(--bg);color:var(--ink);
         font-family:"Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-        font-size:17px;line-height:1.45;font-variant-numeric:tabular-nums;
+        font-size:17px;line-height:1.5;font-variant-numeric:tabular-nums;
         padding-left:var(--sal);padding-right:var(--sar);}
       button,[role="button"],select,input{min-height:44px;touch-action:manipulation;}
-      button{font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);
-        border-radius:6px;padding:.45rem .75rem;cursor:pointer;}
-      button:active{background:var(--accent-soft);}
-      button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;
-        min-height:56px;border-radius:6px;font-size:17px;width:100%;}
+      button{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);
+        border-radius:0;padding:.5rem .85rem;cursor:pointer;font-weight:600;}
+      button:active{background:var(--cyan);}
+      button.primary{background:var(--green);border-color:var(--green);color:var(--dark);font-weight:700;
+        min-height:58px;border-radius:0;font-size:17px;width:100%;}
+      button.primary:active{background:var(--cyan);}
+      button.continue-btn{background:var(--dark);border:1px solid var(--dark);color:#fff;font-weight:700;
+        min-height:60px;border-radius:10px;font-size:1.05rem;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;}
+      button.continue-btn:active{background:#00414A;}
+      form .continue-btn{flex:1 1 auto;min-width:170px;width:auto;}
+      .pinrow .continue-btn{flex:none;width:100%;}
       button:disabled{opacity:.45;cursor:default;}
       input,select{font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);
-        border-radius:6px;padding:.55rem .7rem;}
-      a{color:var(--accent);}
+        border-radius:0;padding:.55rem .7rem;}
+      a{color:var(--dark);font-weight:600;}
       /* Content column sized for 393px: full-bleed on phone, centred wider on desktop.
          Bottom padding clears the fixed tab bar + home indicator. */
-      .wrap{max-width:560px;margin:0 auto;padding:0 16px calc(96px + var(--sab));width:100%;}
+      .wrap{max-width:560px;margin:0 auto;padding:0 20px calc(104px + var(--sab));width:100%;}
       @media(min-width:700px){.wrap{max-width:860px;}}
 
-      /* Sticky header: sits below the Dynamic Island via safe-area top padding, flat ledger bar */
-      .topbar{border-bottom:1px solid var(--line);background:var(--bg);
+      /* Sticky header: dark Jet Black bar below the Dynamic Island */
+      .topbar{border-bottom:1px solid var(--dark);background:var(--dark);color:#fff;
         position:sticky;top:0;z-index:40;padding-top:var(--sat);}
-      .topbar-in{max-width:860px;margin:0 auto;padding:8px 16px;display:flex;gap:10px;align-items:center;min-height:56px;}
-      .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;
+      .topbar-in{max-width:860px;margin:0 auto;padding:10px 20px;display:flex;gap:12px;align-items:center;min-height:60px;}
+      .avatar{width:40px;height:40px;border-radius:0;background:var(--green);color:var(--dark);
         display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;flex:none;}
+      .topbar .avatar{background:var(--green);color:var(--dark);}
       .who{line-height:1.2;min-width:0;}
-      .who small{display:block;font-size:.72rem;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
-      .who strong{display:block;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .who small{display:block;font-size:.72rem;color:var(--cyan);font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
+      .who strong{display:block;font-size:1.02rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
       .topbar .spacer{flex:1;}
-      .topbar button{font-size:.92rem;font-weight:600;padding:.3rem .7rem;min-height:44px;white-space:nowrap;}
-      .topbar button.admin-on,.admin-on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+      .topbar button{font-size:.92rem;font-weight:600;padding:.3rem .75rem;min-height:44px;white-space:nowrap;
+        background:transparent;color:#fff;border-color:var(--cyan);}
+      .topbar button:active{background:var(--cyan);color:var(--dark);}
+      .topbar button.admin-on,.admin-on{background:var(--green);color:var(--dark);border-color:var(--green);font-weight:700;}
 
       /* Sticky bottom navigation — thumb reach, one-handed, above home indicator */
       .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--paper);
-        border-top:1px solid var(--line);padding:4px 8px calc(4px + var(--sab));}
+        border-top:1px solid var(--dark);padding:4px 8px calc(4px + var(--sab));}
       .tabbar-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;}
-      .tabbar button{background:transparent;border:none;border-radius:6px;min-height:56px;
+      .tabbar button{background:transparent;border:none;border-radius:0;min-height:56px;
         padding:5px 2px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;
         gap:3px;color:var(--muted);font-size:.72rem;font-weight:600;line-height:1;}
       .tabbar button svg{width:25px;height:25px;display:block;}
-      .tabbar button.active{color:var(--accent);background:var(--accent-soft);}
-      .tabbar button:active{background:var(--accent-soft);}
+      .tabbar button.active{color:var(--dark);background:var(--cyan);}
+      .tabbar button:active{background:var(--cyan);}
 
-      /* Date navigator — 44pt round-step targets, large centred date */
-      .datenav{display:flex;align-items:flex-start;gap:8px;padding:14px 0 4px;}
-      .datenav .navbtn{width:44px;height:44px;min-height:44px;border-radius:6px;background:var(--paper);
+      /* Date navigator — 44pt step targets, large centred date */
+      .datenav{display:flex;align-items:flex-start;gap:8px;padding:18px 0 4px;}
+      .datenav .navbtn{width:44px;height:44px;min-height:44px;border-radius:0;background:var(--paper);
         border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
         font-size:1.35rem;line-height:1;flex:none;padding:0;}
       .datenav .center{flex:1;text-align:center;min-width:0;}
-      .datenav .date{display:block;font-size:1.5rem;font-weight:700;line-height:1.15;}
-      .datenav .sub{display:block;color:var(--muted);font-size:.88rem;margin-top:1px;}
-      .datenav .today-pill{margin-top:6px;min-height:44px;padding:0 14px;border-radius:6px;
-        background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.9rem;border:1px solid var(--line);}
+      .datenav .date{display:block;font-size:1.6rem;font-weight:700;line-height:1.15;}
+      .datenav .sub{display:block;color:var(--muted);font-size:.9rem;margin-top:2px;}
+      .datenav .today-pill{margin-top:8px;min-height:44px;padding:0 16px;border-radius:0;
+        background:var(--cyan);color:var(--dark);font-weight:700;font-size:.9rem;border:1px solid var(--dark);}
 
-      h2.sec{font-size:1.12rem;margin:22px 0 8px;font-weight:700;}
-      .note{color:var(--muted);font-size:.88rem;line-height:1.5;}
-      .empty{border:1px solid var(--line-soft);background:var(--paper);padding:16px;border-radius:6px;color:var(--muted);font-size:.95rem;}
-      .banner{border:1px solid var(--line);border-left:4px solid var(--red);background:var(--paper);
-        padding:12px 14px;margin:14px 0;border-radius:4px;font-size:.95rem;}
-      .banner.offline{border-left-color:#8a6d1a;background:var(--amber-bg);}
-      .banner.ok{border-left-color:var(--accent);}
-      .banner h2{margin:0 0 6px;font-size:1.08rem;}
+      h2.sec{font-size:1.3rem;margin:26px 0 10px;font-weight:700;line-height:1.25;}
+      .note{color:var(--muted);font-size:.9rem;line-height:1.55;}
+      .empty{border:1px solid var(--line-soft);background:var(--cyan-soft);padding:18px;border-radius:0;color:var(--muted);font-size:.95rem;}
+      .banner{border:1px solid var(--red);background:var(--paper);
+        padding:14px 16px;margin:16px 0;border-radius:0;font-size:.95rem;}
+      .banner.offline{border-color:var(--dark);background:var(--cyan-soft);}
+      .banner.ok{border-color:var(--dark);}
+      .banner h2{margin:0 0 6px;font-size:1.15rem;}
       .banner p{margin:4px 0;}
-      .banner code{background:var(--bg);border:1px solid var(--line-soft);padding:0 4px;border-radius:3px;font-size:.85em;}
+      .banner code{background:var(--cyan-soft);border:1px solid var(--line-soft);padding:0 4px;border-radius:0;font-size:.85em;}
       .banner button{min-height:44px;}
 
-      /* Today / Week — person cards: no wide table, no horizontal scrolling at 393px */
-      .pcard,.wcard{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px 12px;margin-bottom:10px;}
+      /* Today / Week — person cards */
+      .pcard,.wcard{background:var(--paper);border:1px solid var(--line);border-radius:0;padding:16px 14px;margin-bottom:12px;}
       .pcard-head{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;
         padding:0;min-height:48px;text-align:left;border-radius:0;}
       .pcard-head:active{background:none;opacity:.75;}
       .pcard .avatar,.wcard .avatar{width:44px;height:44px;font-size:1.1rem;}
       .pcard-meta{flex:1;min-width:0;}
-      .pcard-meta b{display:block;font-size:1.02rem;line-height:1.25;}
-      .pcard-meta span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      .pct-pill{flex:none;font-size:.92rem;font-weight:700;background:var(--accent-soft);color:var(--accent);
-        border:1px solid var(--line);padding:5px 9px;border-radius:4px;min-width:54px;text-align:center;}
+      .pcard-meta b{display:block;font-size:1.05rem;line-height:1.25;}
+      .pcard-meta span{display:block;font-size:.84rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .pct-pill{flex:none;font-size:.92rem;font-weight:700;background:var(--cyan);color:var(--dark);
+        border:1px solid var(--dark);padding:5px 9px;border-radius:0;min-width:54px;text-align:center;}
       .pct-pill.low{background:var(--paper);color:var(--muted);}
-      .progress{height:6px;background:var(--line-soft);border-radius:3px;overflow:hidden;margin:12px 0 10px;}
-      .progress i{display:block;height:100%;background:var(--accent);}
+      .progress{height:8px;background:var(--cyan);border-radius:0;overflow:hidden;margin:12px 0 10px;}
+      .progress i{display:block;height:100%;background:var(--dark);}
       .chips{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
       @media(min-width:480px){.chips{grid-template-columns:repeat(7,1fr);}}
       @media(min-width:700px){.chips{grid-template-columns:repeat(14,1fr);}}
-      .chip{border-radius:4px;background:var(--bg);border:1px solid var(--line-soft);padding:6px 1px 5px;text-align:center;line-height:1.15;min-height:44px;}
+      .chip{border-radius:0;background:var(--cyan-soft);border:1px solid var(--line-soft);padding:6px 1px 5px;text-align:center;line-height:1.15;min-height:44px;}
       .chip b{display:block;font-size:.7rem;}
       .chip span{display:block;font-size:.78rem;margin-top:2px;}
-      .chip.done{background:var(--accent-soft);border-color:var(--line);}
-      .chip.done span{color:var(--accent);font-weight:700;}
+      .chip.done{background:var(--green-soft);border-color:var(--dark);}
+      .chip.done span{color:var(--dark);font-weight:700;}
       .chip.part span{font-size:.68rem;font-weight:600;}
-      .legend{font-size:.8rem;color:var(--muted);margin-top:6px;line-height:1.55;}
-      .legend b{color:var(--ink);font-weight:600;}
-      .cta{margin:16px 0 4px;}
+      .legend{font-size:.82rem;color:var(--muted);margin-top:8px;line-height:1.6;}
+      .legend b{color:var(--ink);font-weight:700;}
+      .cta{margin:18px 0 4px;}
       .wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;}
-      .wcell{text-align:center;background:var(--bg);border:1px solid var(--line-soft);border-radius:4px;padding:6px 1px;line-height:1.2;min-height:44px;}
+      .wcell{text-align:center;background:var(--cyan-soft);border:1px solid var(--line-soft);border-radius:0;padding:6px 1px;line-height:1.2;min-height:44px;}
       .wcell b{display:block;font-size:.66rem;color:var(--muted);font-weight:600;}
       .wcell span{display:block;font-size:.85rem;margin-top:2px;font-weight:600;}
-      .done-mark{color:var(--accent);font-weight:700;}
+      .done-mark{color:var(--dark);font-weight:700;}
       .partial{font-size:.7rem !important;}
       .missed{color:var(--red);}
 
-      /* Checklist — tall, thumb-friendly rows (lower-half primary actions) */
-      .group-head{font-size:.95rem;font-weight:700;margin:20px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--line);}
-      .item{border:1px solid var(--line);background:var(--paper);border-radius:6px;
-        padding:12px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;min-height:72px;}
-      .item.done{border-color:var(--accent);}
+      /* Checklist — tall, thumb-friendly rows */
+      .group-head{font-size:1rem;font-weight:700;margin:24px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--dark);}
+      .item{border:1px solid var(--line);background:var(--paper);border-radius:0;
+        padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;min-height:72px;}
+      .item.done{background:var(--green-soft);}
       .item .main{flex:1;min-width:0;padding-top:4px;}
-      .item .name{font-weight:600;font-size:1rem;line-height:1.3;}
-      .item .desc{color:var(--muted);font-size:.87rem;margin-top:1px;line-height:1.4;}
-      .badge{display:inline-block;font-size:.72rem;font-weight:600;color:var(--accent);
-        border:1px solid var(--accent);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:2px;white-space:nowrap;}
-      .badge.grey{color:var(--muted);border-color:var(--line);}
-      .cbox{flex:none;width:44px;height:44px;min-height:44px;border:2px solid var(--muted);
-        border-radius:6px;background:var(--paper);font-size:1.35rem;line-height:1;padding:0;
-        color:var(--accent);display:flex;align-items:center;justify-content:center;}
-      .cbox.on{border-color:var(--accent);background:var(--accent-soft);}
+      .item .name{font-weight:700;font-size:1.02rem;line-height:1.3;}
+      .item .desc{color:var(--muted);font-size:.88rem;margin-top:2px;line-height:1.45;}
+      .badge{display:inline-block;font-size:.72rem;font-weight:700;color:var(--dark);
+        border:1px solid var(--dark);border-radius:0;padding:0 5px;margin-left:6px;vertical-align:2px;white-space:nowrap;background:var(--cyan);}
+      .badge.grey{color:var(--muted);border-color:var(--line-soft);background:var(--paper);}
+      .cbox{flex:none;width:44px;height:44px;min-height:44px;border:2px solid var(--dark);
+        border-radius:0;background:var(--paper);font-size:1.35rem;line-height:1;padding:0;
+        color:var(--dark);display:flex;align-items:center;justify-content:center;}
+      .cbox.on{border-color:var(--dark);background:var(--green);}
       .cbox:disabled{opacity:.5;}
       .counter{flex:none;display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:158px;}
       .counter button{width:44px;height:44px;min-height:44px;font-size:1.2rem;padding:0;}
@@ -148,69 +162,72 @@
       .counter .val small{display:block;color:var(--muted);font-weight:400;font-size:.72rem;}
       .quick{display:flex;gap:6px;width:100%;justify-content:flex-end;margin-top:6px;}
       .quick button{width:auto;height:44px;min-height:44px;font-size:.85rem;font-weight:600;padding:0 12px;}
-      .ro-mark{flex:none;font-weight:700;color:var(--accent);font-size:.95rem;padding-top:8px;text-align:right;}
+      .ro-mark{flex:none;font-weight:700;color:var(--dark);font-size:.95rem;padding-top:8px;text-align:right;}
+      /* Juz picker (Günlük Hatmi Quran only) — manual per person, per day */
+      .juzpick{flex:none;display:flex;flex-direction:column;gap:3px;font-size:.72rem;color:var(--muted);font-weight:600;padding-top:2px;}
+      .juzpick select{min-height:44px;font-size:1rem;font-weight:700;color:var(--ink);padding:.3rem .45rem;max-width:118px;}
       .ro-mark .cnt{color:var(--ink);font-weight:600;display:block;}
       .ro-mark .notdone{color:var(--muted);font-weight:400;font-size:.88rem;}
 
-      /* Activity feed — flat ledger list */
-      .feed{border:1px solid var(--line);background:var(--paper);border-radius:6px;overflow:hidden;}
-      .feed>div{padding:10px 12px;border-bottom:1px solid var(--line-soft);font-size:.94rem;line-height:1.4;display:flex;gap:8px;align-items:flex-start;}
+      /* Activity feed — flat list */
+      .feed{border:1px solid var(--line);background:var(--paper);border-radius:0;overflow:hidden;}
+      .feed>div{padding:11px 14px;border-bottom:1px solid var(--line-soft);font-size:.94rem;line-height:1.45;display:flex;gap:8px;align-items:flex-start;}
       .feed>div:last-child{border-bottom:none;}
-      .feed .fdot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;margin-top:7px;}
+      .feed .fdot{width:8px;height:8px;border-radius:0;background:var(--dark);flex:none;margin-top:7px;}
       .feed .t{color:var(--muted);font-size:.84rem;white-space:nowrap;}
 
       /* Setup / PIN — full-height on 393x852, big targets, no zoom on focus (16px+ input) */
-      .setup{max-width:430px;margin:0 auto;padding:calc(24px + var(--sat)) 20px calc(28px + var(--sab));min-height:100dvh;display:flex;flex-direction:column;}
-      .setup .setup-badge{width:52px;height:52px;border-radius:6px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin-bottom:16px;}
-      .setup h1{font-size:1.65rem;line-height:1.15;margin:0 0 8px;}
-      .setup p{color:var(--muted);margin:0 0 18px;font-size:1rem;line-height:1.5;}
-      .namelist{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
-      .namelist button{text-align:left;padding:0 .95rem;min-height:56px;font-size:1.05rem;display:flex;align-items:center;justify-content:space-between;}
-      .namelist button.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:700;}
-      .namelist button.sel::after{content:"¹3";color:var(--accent);font-weight:700;}
-      .pinrow{display:flex;flex-direction:column;gap:10px;}
+      .setup{max-width:430px;margin:0 auto;padding:calc(28px + var(--sat)) 24px calc(28px + var(--sab));min-height:100dvh;display:flex;flex-direction:column;}
+      .setup .setup-brand{margin-bottom:22px;text-align:left;font-size:1.9rem;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--dark);line-height:1.1;}
+      .setup h1{font-size:2rem;line-height:1.15;margin:0 0 10px;font-weight:700;}
+      .setup p{color:var(--muted);margin:0 0 22px;font-size:1rem;line-height:1.55;}
+      .namelist{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+      .namelist button{text-align:left;padding:0 1rem;min-height:58px;font-size:1.08rem;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--dark);border-radius:0;background:var(--paper);}
+      .namelist button.sel{border-color:var(--dark);background:var(--cyan);font-weight:700;}
+      .namelist button.sel::after{content:"\u2713";color:var(--dark);font-weight:700;}
+      .pinrow{display:flex;flex-direction:column;gap:12px;}
       .pinrow input{flex:1;font-size:1.35rem;letter-spacing:.4em;text-align:center;min-height:60px;font-weight:700;padding-left:22px;}
       .err{color:var(--red);font-size:.92rem;margin-top:10px;min-height:1.2em;text-align:center;}
 
       /* 7-day strip (person view) */
-      .strip{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--line);background:var(--paper);border-radius:6px;overflow:hidden;}
+      .strip{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--line);background:var(--paper);border-radius:0;overflow:hidden;}
       .strip>div{padding:8px 1px;text-align:center;border-right:1px solid var(--line-soft);font-size:.88rem;font-weight:600;min-height:52px;}
       .strip>div:last-child{border-right:none;}
       .strip .d{display:block;color:var(--muted);font-size:.7rem;margin-bottom:2px;}
-      .strip .sel{background:var(--accent-soft);}
+      .strip .sel{background:var(--cyan);}
 
-      .modal{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:14px;margin:14px 0;}
-      .modal h3{margin:0 0 8px;font-size:1.02rem;}
+      .modal{border:1px solid var(--line);background:var(--cyan-soft);border-radius:0;padding:16px;margin:16px 0;}
+      .modal h3{margin:0 0 8px;font-size:1.1rem;}
       .modal input{min-height:52px;font-size:1rem;}
       .modal button{min-height:48px;}
       .modal .primary{flex:1;width:auto;}
       .rowflex{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
       .loading{padding:60px 0;text-align:center;color:var(--muted);}
 
-      /* Ledger tables — Today & Week: paper-ledger, flat 1px rules.
+      /* Tables — Today & Week: flat 1px rules, dark header.
          The table scrolls horizontally ONLY inside .tablebox (page itself
          never scrolls sideways); first column (person) stays sticky. */
-      .tablebox{border:1px solid var(--line);background:var(--paper);border-radius:6px;
-        overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;max-width:100%;margin-bottom:10px;}
-      .tablebox:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+      .tablebox{border:1px solid var(--line);background:var(--paper);border-radius:0;
+        overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;max-width:100%;margin-bottom:12px;}
+      .tablebox:focus-visible{outline:2px solid var(--dark);outline-offset:2px;}
       table.ledger{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;}
       table.ledger th,table.ledger td{border-bottom:1px solid var(--line-soft);border-right:1px solid var(--line-soft);
         padding:7px 4px;text-align:center;font-size:.84rem;line-height:1.25;min-width:38px;height:48px;vertical-align:middle;background:var(--paper);}
       table.ledger tr:last-child td{border-bottom:none;}
       table.ledger th:last-child,table.ledger td:last-child{border-right:none;}
-      table.ledger thead th{background:var(--accent);color:#fff;font-size:.72rem;font-weight:700;
+      table.ledger thead th{background:var(--dark);color:#fff;font-size:.72rem;font-weight:700;
         letter-spacing:.02em;padding:8px 4px;height:auto;white-space:nowrap;}
       table.ledger thead th small{display:block;font-weight:400;font-size:.68rem;opacity:.85;letter-spacing:0;}
-      table.ledger td.done-cell{background:var(--accent-soft);}
-      table.ledger td.total,table.ledger th.total{min-width:58px;background:var(--accent-soft);font-weight:700;color:var(--accent);}
-      table.ledger thead th.total{background:var(--accent);color:#fff;}
+      table.ledger td.done-cell{background:var(--green-soft);}
+      table.ledger td.total,table.ledger th.total{min-width:58px;background:var(--cyan);font-weight:700;color:var(--dark);}
+      table.ledger thead th.total{background:var(--dark);color:#fff;}
       table.ledger th.person,table.ledger td.person{position:sticky;left:0;text-align:left;
         min-width:118px;max-width:132px;width:118px;padding:6px 8px;border-right:1px solid var(--line);}
       table.ledger td.person{background:var(--paper);z-index:2;}
-      table.ledger thead th.person{background:var(--accent);color:#fff;z-index:3;}
+      table.ledger thead th.person{background:var(--dark);color:#fff;z-index:3;}
       .person-btn{display:block;width:100%;background:none;border:none;border-radius:0;padding:0;min-height:0;
         text-align:left;font-weight:700;font-size:.92rem;line-height:1.2;color:var(--ink);cursor:pointer;white-space:normal;}
-      .person-btn:active{background:none;color:var(--accent);}
+      .person-btn:active{background:none;color:var(--dark);}
       .person-sub{display:block;font-size:.7rem;color:var(--muted);font-weight:400;line-height:1.25;margin-top:2px;
         white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
       .total-sub{display:block;font-size:.7rem;font-weight:400;color:var(--muted);margin-top:1px;}
@@ -218,26 +235,271 @@
       .scroll-hint{font-size:.8rem;color:var(--muted);margin:-4px 0 10px;line-height:1.4;}
 
       /* Today vs Week — distinct headers + per-person done / not-done status */
-      .viewtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-        padding:3px 8px;border-radius:4px;}
-      .viewtag.today{background:var(--accent);color:#fff;}
-      .viewtag.week{background:var(--paper);color:var(--accent);border:1px solid var(--accent);}
-      .statusbox{border:1px solid var(--line);background:var(--paper);border-radius:6px;overflow:hidden;margin-bottom:6px;}
-      .status-row{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;
-        border-bottom:1px solid var(--line-soft);padding:9px 12px;min-height:52px;text-align:left;border-radius:0;}
+      .viewtag{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+        padding:4px 10px;border-radius:0;}
+      .viewtag.today{background:var(--dark);color:#fff;}
+      .viewtag.week{background:var(--cyan);color:var(--dark);border:1px solid var(--dark);}
+      .statusbox{border:1px solid var(--line);background:var(--paper);border-radius:0;overflow:hidden;margin-bottom:6px;}
+      .status-row{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;
+        border-bottom:1px solid var(--line-soft);padding:11px 14px;min-height:56px;text-align:left;border-radius:0;}
       .status-row:last-child{border-bottom:none;}
-      button.status-row:active{background:var(--accent-soft);}
-      .status-row .avatar{width:36px;height:36px;font-size:.95rem;flex:none;}
-      .status-name{flex:1;min-width:0;font-weight:600;font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      .status-name small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;white-space:normal;}
-      .status-pill{flex:none;font-size:.8rem;font-weight:700;padding:4px 8px;border-radius:4px;border:1px solid var(--line);text-align:center;}
-      .status-pill.done{background:var(--accent);border-color:var(--accent);color:#fff;}
-      .status-pill.part{background:var(--accent-soft);color:var(--accent);}
-      .status-pill.none{background:var(--paper);color:var(--muted);}
+      button.status-row:active{background:var(--cyan);}
+      .status-row .avatar{width:38px;height:38px;font-size:.95rem;flex:none;}
+      .status-name{flex:1;min-width:0;font-weight:700;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .status-name small{display:block;font-weight:400;color:var(--muted);font-size:.8rem;white-space:normal;}
+      .status-pill{flex:none;font-size:.82rem;font-weight:700;padding:5px 9px;border-radius:0;border:1px solid var(--dark);text-align:center;}
+      .status-pill.done{background:var(--green);border-color:var(--dark);color:var(--dark);}
+      .status-pill.part{background:var(--cyan);color:var(--dark);}
+      .status-pill.none{background:var(--paper);color:var(--muted);border-color:var(--line-soft);}
       .status-pill.missed{background:var(--paper);color:var(--red);border-color:var(--red);}
       .tabbar-in.cols3{grid-template-columns:repeat(3,1fr);}
-      .namelist .sub{display:block;font-size:.78rem;color:var(--muted);font-weight:400;margin-top:1px;}
+      .namelist .sub{display:block;font-size:.8rem;color:var(--muted);font-weight:400;margin-top:1px;}
       @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+      /* ===== "loading" loader — Uiverse.io by andrew-manzyk =====
+         9 clipped slices of the word "loading", scrolling spans, and a
+         wobbling line underneath. Used only on the dark 2-second loading
+         screen, big and white — no FAYSALABAD text on that screen. The
+         name-picker / login screen shows FAYSALABAD as plain text instead
+         (see .setup-brand above) — no loader classes, no scrolling, no
+         wobble line there.
+         The base size (4em) makes the loader ~496px wide, wider than
+         the iPhone 14 Pro screen, so the loading placement scales it down
+         with a transform; its layout box is contained by the
+         overflow:hidden loadscreen. */
+      .loadscreen{position:fixed;inset:0;z-index:100;background:var(--dark);
+        display:flex;align-items:center;justify-content:center;overflow:hidden;
+        padding:calc(24px + var(--sat)) 24px calc(24px + var(--sab));}
+      .loadscreen .loader{transform:scale(.66);flex:none;}
+      .loader {
+        --main-size: 4em;
+        --text-color: #ffffff;
+        --shine-color: #ffffff40;
+        --shadow-color: #aaaaaa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        user-select: none;
+        position: relative;
+        font-size: var(--main-size);
+        font-weight: 900;
+        text-transform: uppercase;
+        color: var(--text-color);
+        width: 7.3em;
+        height: 1em;
+        filter: drop-shadow(0 0 0.05em var(--shine-color));
+      }
+      .loader .text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        position: absolute;
+      }
+      .loader .text:nth-child(1) {
+        clip-path: polygon(0% 0%, 11.11% 0%, 11.11% 100%, 0% 100%);
+        font-size: calc(var(--main-size) / 20);
+        margin-left: -2.1em;
+        opacity: 0.6;
+      }
+      .loader .text:nth-child(2) {
+        clip-path: polygon(11.11% 0%, 22.22% 0%, 22.22% 100%, 11.11% 100%);
+        font-size: calc(var(--main-size) / 16);
+        margin-left: -0.98em;
+        opacity: 0.7;
+      }
+      .loader .text:nth-child(3) {
+        clip-path: polygon(22.22% 0%, 33.33% 0%, 33.33% 100%, 22.22% 100%);
+        font-size: calc(var(--main-size) / 13);
+        margin-left: -0.33em;
+        opacity: 0.8;
+      }
+      .loader .text:nth-child(4) {
+        clip-path: polygon(33.33% 0%, 44.44% 0%, 44.44% 100%, 33.33% 100%);
+        font-size: calc(var(--main-size) / 11);
+        margin-left: -0.05em;
+        opacity: 0.9;
+      }
+      .loader .text:nth-child(5) {
+        clip-path: polygon(44.44% 0%, 55.55% 0%, 55.55% 100%, 44.44% 100%);
+        font-size: calc(var(--main-size) / 10);
+        margin-left: 0em;
+        opacity: 1;
+      }
+      .loader .text:nth-child(6) {
+        clip-path: polygon(55.55% 0%, 66.66% 0%, 66.66% 100%, 55.55% 100%);
+        font-size: calc(var(--main-size) / 11);
+        margin-left: 0.05em;
+        opacity: 0.9;
+      }
+      .loader .text:nth-child(7) {
+        clip-path: polygon(66.66% 0%, 77.77% 0%, 77.77% 100%, 66.66% 100%);
+        font-size: calc(var(--main-size) / 13);
+        margin-left: 0.33em;
+        opacity: 0.8;
+      }
+      .loader .text:nth-child(8) {
+        clip-path: polygon(77.77% 0%, 88.88% 0%, 88.88% 100%, 77.77% 100%);
+        font-size: calc(var(--main-size) / 16);
+        margin-left: 0.98em;
+        opacity: 0.7;
+      }
+      .loader .text:nth-child(9) {
+        clip-path: polygon(88.88% 0%, 100% 0%, 100% 100%, 88.88% 100%);
+        font-size: calc(var(--main-size) / 20);
+        margin-left: 2.1em;
+        opacity: 0.6;
+      }
+      .loader .text span {
+        animation:
+          scrolling 2s cubic-bezier(0.1, 0.6, 0.9, 0.4) infinite,
+          shadow 2s cubic-bezier(0.1, 0.6, 0.9, 0.4) infinite;
+      }
+      .loader .text:nth-child(1) span {
+        background: linear-gradient(to right, var(--text-color) 4%, var(--shadow-color) 7%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(2) span {
+        background: linear-gradient(to right, var(--text-color) 9%, var(--shadow-color) 13%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(3) span {
+        background: linear-gradient(to right, var(--text-color) 15%, var(--shadow-color) 18%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(4) span {
+        background: linear-gradient(to right, var(--text-color) 20%, var(--shadow-color) 23%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(6) span {
+        background: linear-gradient(to right, var(--shadow-color) 29%, var(--text-color) 32%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(7) span {
+        background: linear-gradient(to right, var(--shadow-color) 34%, var(--text-color) 37%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(8) span {
+        background: linear-gradient(to right, var(--shadow-color) 39%, var(--text-color) 42%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .text:nth-child(9) span {
+        background: linear-gradient(to right, var(--shadow-color) 45%, var(--text-color) 48%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .loader .line {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        height: 0.05em;
+        width: calc(var(--main-size) / 2);
+        margin-top: 0.9em;
+        border-radius: 0.05em;
+      }
+      .loader .line::before {
+        content: "";
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background-color: var(--text-color);
+        opacity: 0.3;
+      }
+      .loader .line::after {
+        content: "";
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        background-color: var(--text-color);
+        border-radius: 0.05em;
+        transform: translateX(-90%);
+        animation: wobble 2s cubic-bezier(0.5, 0.8, 0.5, 0.2) infinite;
+      }
+      @keyframes wobble {
+        0% { transform: translateX(-90%); }
+        50% { transform: translateX(90%); }
+        100% { transform: translateX(-90%); }
+      }
+      @keyframes scrolling {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+      @keyframes shadow {
+        0% { background-position: -98% 0; }
+        100% { background-position: 102% 0; }
+      }
+      @media (prefers-reduced-motion: reduce){
+        .loader .text span,.loader .line::after{animation:none !important;}
+      }
+
+      /* ===== Day selector — Uiverse.io by hayyangovinda (as provided) ===== */
+      .days-btn-container {
+        display: flex;
+        width: 300px;
+        align-items: center;
+        justify-content: space-evenly;
+        height: 34px;
+      }
+      .day-btn {
+        display: none; /* Hide the original checkbox */
+      }
+      .day-label {
+        background-color: transparent;
+        font-size: 11px;
+        font-weight: 600;
+        color: #00262B;
+        cursor: pointer;
+        border: 2px solid #00262B;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 5px;
+      }
+      /* Apply styles for the selected state — Northpoint palette gradient */
+      .day-btn:checked + .day-label {
+        background-color: #ABFFAE;
+        background-image: linear-gradient(147deg, #ABFFAE 0%, #CDE3E6 74%);
+        border: none;
+        color: #00262B;
+      }
+      /* Width adapted to the iPhone 14 Pro screen: the strip runs the full
+         content width, with room under each circle for the date number and
+         that day's done mark (kept from the previous strip). */
+      .days-btn-container{width:100%;height:auto;align-items:flex-start;
+        border:1px solid var(--line);background:var(--paper);padding:10px 4px 8px;}
+      .daypick{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex:1;min-width:0;}
+      .day-meta{font-size:.72rem;color:var(--muted);font-weight:600;text-align:center;line-height:1.2;}
     </style>
   </head>
   <body>
@@ -257,34 +519,12 @@
     var MEMBERS = ["Tahsim Abi","Atiq Abi","Husein Abi","Fikri Abi","Hamid Abi"];
 
     /* ============ Items ============ */
-    /* due: "daily" | "week" (any day this week) | "fri" | "sat-sun" | "month" | "first-wed" */
+    /* due: "daily" | "week" (any day this week) | "fri" | "sat-sun" | "month" | "first-wed" | "month-tue" (Tuesdays, once a month) */
     var ITEMS = [
-      {id:"yasin",       code:"YS", group:"Daily", name:"Yasin-i Şerif Hatmi", desc:"Full reading of Surah Yasin, every morning.", due:"daily"},
-      {id:"ayetulkursi", code:"AK", group:"Daily", name:"Ayetül Kürsi Hatmi", desc:"Recitation of Ayat al-Kursi, every morning.", due:"daily"},
-      {id:"teheccut",    code:"TC", group:"Daily", name:"Teheccüt Namazı", desc:"Night prayer, before dawn.", due:"daily"},
-      {id:"duha",        code:"DH", group:"Daily", name:"Duha Namazı", desc:"Forenoon prayer.", due:"daily"},
-      {id:"kureys",      code:"KR", group:"Daily", name:"Küreyş Süresi, 21x", desc:"Surah Quraysh, 21 times, after the morning and evening prayers.", target:21, due:"daily"},
-      {id:"yavahhab",    code:"YV", group:"Daily", name:"Ya Vahhab, 14x", desc:"Ya Wahhab, 14 times, after the obligatory prayers.", target:14, due:"daily"},
-      {id:"sabahsunnet", code:"SS", group:"Daily", name:"Sabah namazının sünnetinde", desc:"In the Fajr sunnah: Fil to Kafirun in the first rakat, Nasr to Nas in the second, then the Ahzab prayer.", due:"daily"},
-      {id:"afet",        code:"AF", group:"Daily", name:"Afet Duası, 3x", desc:"Prayer against calamities, 3 times, morning and evening.", target:3, due:"daily"},
-      {id:"bela",        code:"BL", group:"Daily", name:"Bela ve Müsibetlerden Muhafaza İçin, 3x", desc:"For protection from trouble and misfortune, 3 times after every prayer.", target:3, due:"daily"},
-      {id:"mumin",       code:"MM", group:"Daily", name:"Mumin (Gafir) Süresi, 3x", desc:"Surah Ghafir, 3 times, morning and evening.", target:3, due:"daily"},
-      {id:"cunnetul",    code:"CE", group:"Daily", name:"Cünnet-ül Esma, 19x", desc:"Cunnet-ul Esma, 19 times, alone, at a free time.", target:19, due:"daily"},
-      {id:"vallahu",     code:"VG", group:"Daily", name:"Vallahu Galibun Ala Emrih Hatmi, 1461x", desc:"Recited 1461 times after Yasin-i Şerif, if applicable.", target:1461, due:"daily"},
-      {id:"munciye",     code:"SM", group:"Daily", name:"Salat-ı Münciye, 1000x", desc:"Salat al-Munjiyah, 1000 times, in the morning.", target:1000, due:"daily"},
-      {id:"nariye",      code:"SN", group:"Daily", name:"Salat-ı Nariye, 4444x", desc:"Salat al-Nariyah, 4444 times, after the morning prayer.", target:4444, due:"daily"},
-
-      {id:"kuranhatmi",  code:"KH", group:"Weekly", name:"Kuran-ı Kerim Hatmi", desc:"Complete reading of the Quran, at least once a week.", due:"week", badge:"Due this week"},
-      {id:"hatmievbiya", code:"HE", group:"Weekly", name:"Hatmi Evbiya", desc:"Once a week, after the evening prayer.", due:"week", badge:"Due this week"},
-      {id:"evrad",       code:"EV", group:"Weekly", name:"Evrad-ı Şerife", desc:"Once a week, after the morning prayer.", due:"week", badge:"Due this week"},
-      {id:"hacet",       code:"HC", group:"Weekly", name:"Hacet Namazıyla İltica, 12 rakat", desc:"Prayer of need, 12 rakats, once a week on Saturday or Sunday evening.", due:"sat-sun"},
-      {id:"tesbih",      code:"TN", group:"Weekly", name:"Tesbih Namazı", desc:"Once a week, on Friday evening.", due:"fri"},
-      {id:"secde",       code:"SA", group:"Weekly", name:"Secde Ayetleriyle İltica", desc:"Once a week, with the prostration verses.", due:"week", badge:"Due this week"},
-      {id:"lehevle",     code:"LH", group:"Weekly", name:"Le Hevle Ve Le Quvvete Hatmi, 500x", desc:"500 times, twice a month.", target:500, due:"week", badge:"Twice a month"},
-
-      {id:"istigfar",    code:"IS", group:"Monthly", name:"İstiğfar Hatmi, 1001x", desc:"1001 times, on the first Wednesday of the month, together with the Nakşi hatmi.", target:1001, due:"first-wed"},
-      {id:"fatir",       code:"FT", group:"Monthly", name:"Fatir Süresinin 41. Ayeti, 400x", desc:"Verse 41 of Surah Fatir, 400 times, once a month, alone.", target:400, due:"month", badge:"Due this month"},
-      {id:"tevhid",      code:"KT", group:"Monthly", name:"Kelime-i Tevhid Hatmi, 70.000x", desc:"70,000 times, following the schedule.", target:70000, due:"month", badge:"Due this month"}
+      {id:"cunnetul",    code:"CE", group:"Daily", name:"Cünnet-ül Esma, 19x", desc:"Cunnet-ul Esma, 19 times, every day, alone (münferiden).", target:19, due:"daily"},
+      {id:"hacet",       code:"HC", group:"Weekly", name:"Hacet Namazı, 12 rakat", desc:"Prayer of need, 12 rakats, once a week on a Saturday or Sunday evening. In each rakat: 7 Fatiha, 7 Ayetül Kürsi, 7 Kafirun, 5 İhlas, 5 Felak, 5 Nas.", due:"sat-sun"},
+      {id:"fatir",       code:"FT", group:"Monthly", name:"Fatir Suresi 41. Ayet, 400x", desc:"Verse 41 of Surah Fatir, 400 times, once a month on a Tuesday, alone (münferiden).", target:400, due:"month-tue", badge:"Monthly \u00b7 Tuesday"},
+      {id:"gunlukhatmi", code:"KH", group:"Daily", name:"Günlük Hatmi Quran (Kuran-ı Kerim Hatmi)", desc:"Daily Quran hatmi \u2014 mark done for the day and choose the juz reached that day (1\u201330).", due:"daily", juz:true}
     ];
     var ITEM_BY_ID = {};
     ITEMS.forEach(function(it){ ITEM_BY_ID[it.id]=it; });
@@ -298,6 +538,7 @@
         case "fri": return dow===5;
         case "sat-sun": return dow===0 || dow===6;
         case "first-wed": return dow===3 && date.getDate()<=7;
+        case "month-tue": return dow===2;
       }
       return true;
     }
@@ -342,7 +583,8 @@
       online: navigator.onLine,
       setupError:null,         /* string when tables missing */
       bootError:null,
-      setupName:null, setupMsg:""
+      setupName:null, setupMsg:"",
+      loaderDone:false         /* 2-second "loading" loading screen seen */
     };
     function key(person,date,itemId){ return person+"|"+date+"|"+itemId; }
     function getCI(person,date,itemId){ return state.checkins[key(person,date,itemId)] || null; }
@@ -447,7 +689,9 @@
     function oldValText(row,item){
       if(!row) return "not done";
       if(item.target) return (row.count||0)+"/"+item.target;
-      return row.done ? "done" : "not done";
+      var t = row.done ? "done" : "not done";
+      if(item.juz && row.count) t += " (Juz "+row.count+")";
+      return t;
     }
     function applyLocal(person,date,itemId,done,count,target){
       var k=key(person,date,itemId);
@@ -460,8 +704,10 @@
       var oldText=oldValText(row,item);
       var target=item.target||null;
       if(item.target){ count=Math.max(0,Math.min(item.target,count)); done = count>=item.target; }
+      else if(item.juz){ count=Math.max(0,Math.min(30,count||0)); done=!!done; }
       else { count=0; done=!!done; }
       var newText = item.target ? (count+"/"+item.target) : (done?"done":"not done");
+      if(item.juz && count>0) newText += " (Juz "+count+")";
       if(oldText===newText){ render(); return; }
       applyLocal(person,date,item.id,done,count,target);
       render();
@@ -510,8 +756,25 @@
     }
 
     /* ============ Completion maths ============ */
+    /* Fatir is due once a month, on a Tuesday. Returns the date (yyyy-mm-dd)
+       of an earlier completed Fatir in the same month as dateObj, or null.
+       Once it is done that month, later Tuesdays no longer count it as due. */
+    function fatirDoneEarlier(person,dateObj){
+      var ym=dstr(dateObj).slice(0,7), ds=dstr(dateObj), found=null;
+      Object.keys(state.checkins).forEach(function(k){
+        var r=state.checkins[k];
+        if(r.person===person && r.item_id==="fatir" && r.done &&
+           String(r.check_date).slice(0,7)===ym && r.check_date<ds){
+          if(!found || r.check_date<found) found=r.check_date;
+        }
+      });
+      return found;
+    }
     function dayStats(person,dateObj){
-      var ds=dstr(dateObj), items=dueItems(dateObj), doneN=0, frac=0;
+      var ds=dstr(dateObj), doneN=0, frac=0;
+      var items=dueItems(dateObj).filter(function(it){
+        return it.id!=="fatir" || !fatirDoneEarlier(person,dateObj);
+      });
       items.forEach(function(it){
         var r=getCI(person,ds,it.id);
         if(!r) return;
@@ -533,15 +796,38 @@
     function itemMark(person,dateObj,item){
       var ds=dstr(dateObj), r=getCI(person,ds,item.id);
       var isPast = ds<dstr(new Date());
-      if(!r) return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+      if(item.juz){
+        /* Günlük Hatmi Quran: done mark plus the manually entered juz. */
+        if(!r) return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+        var jc=r.count||0;
+        if(r.done) return {cls:"done-mark", txt:"\u2713"+(jc?" Juz "+jc:"")};
+        if(jc>0) return {cls:"partial", txt:"Juz "+jc};
+        return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+      }
+      if(!r){
+        /* Fatir already completed earlier this month: satisfied, not missed. */
+        if(item.id==="fatir" && fatirDoneEarlier(person,dateObj)) return {cls:"", txt:"\u2713"};
+        return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+      }
       if(item.target){
         var c=r.count||0;
         if(r.done || c>=item.target) return {cls:"done-mark", txt:"\u2713"};
         if(c>0) return {cls:"partial", txt:c+"/"+item.target};
+        if(item.id==="fatir" && fatirDoneEarlier(person,dateObj)) return {cls:"", txt:"\u2713"};
         return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
       }
       if(r.done) return {cls:"done-mark", txt:"\u2713"};
       return isPast ? {cls:"missed", txt:"\u2014"} : {cls:"", txt:"\u00b7"};
+    }
+    /* Week cell for Günlük Hatmi Quran: the juz reached that day, as entered
+       by that person. Empty / \u2014 when nothing was entered \u2014 never guessed. */
+    function juzCell(person,dateObj){
+      var r=getCI(person,dstr(dateObj),"gunlukhatmi");
+      var isPast = dstr(dateObj)<dstr(new Date());
+      if(!r) return isPast ? '<span class="missed">\u2014</span>' : "\u00b7";
+      if(r.count>0) return '<span class="'+(r.done?"done-mark":"partial")+'">'+(r.done?"\u2713 ":"")+"Juz "+r.count+"</span>";
+      if(r.done) return '<span class="done-mark">\u2713</span>';
+      return isPast ? '<span class="missed">\u2014</span>' : "\u00b7";
     }
     function personCell(p,subText){
       return '<td class="person"><button class="person-btn" data-act="open-person" data-p="'+esc(p)+'">'+
@@ -582,6 +868,10 @@
     /* ============ Rendering ============ */
     var app=document.getElementById("app");
     function render(){
+      /* First thing on every open: the 2-second "loading" loading screen.
+         No button — after 2s the timer below flips loaderDone and the app
+         continues to the name picker (or straight in, if remembered). */
+      if(!state.loaderDone){ app.innerHTML = loaderView(); return; }
       if(state.setupError){ app.innerHTML = setupErrorView(); return; }
       if(state.bootError){ app.innerHTML = '<div class="wrap"><div class="banner"><h2>Could not connect</h2><p>'+
         esc(state.bootError)+'</p><p><button data-act="reload">Try again</button></p></div></div>'; return; }
@@ -717,10 +1007,24 @@
         var gi=items.filter(function(it){return it.group===g;});
         if(!gi.length) return;
         h+='<div class="group-head">'+g+"</div>";
-        gi.forEach(function(it){ h+=itemRow(person,ds,it,editable); });
+        gi.forEach(function(it){
+          /* Fatir, already completed earlier this month: show it as done for
+             the month instead of asking for it again on the next Tuesday. */
+          if(it.id==="fatir" && !getCI(person,ds,it.id)){
+            var fd=fatirDoneEarlier(person,date);
+            if(fd){ h+=fatirDoneRow(it,fd); return; }
+          }
+          h+=itemRow(person,ds,it,editable);
+        });
       });
       if(!items.length) h+='<div class="empty">No items due on this day.</div>';
       return h;
+    }
+    function fatirDoneRow(it,fd){
+      return '<div class="item done"><div class="main"><span class="name">'+esc(it.name)+'</span>'+
+        '<span class="badge">Done this month</span>'+
+        '<div class="desc">Already completed this month, on '+fmtDate(parseD(fd))+".</div></div>"+
+        '<span class="ro-mark"><span class="done-mark">\u2713 Done</span></span></div>';
     }
     function itemRow(person,ds,it,editable){
       var r=getCI(person,ds,it.id);
@@ -750,6 +1054,19 @@
           h+='<span class="ro-mark">'+(done?'<span class="done-mark">\u2713</span> ':'')+
              '<span class="cnt">'+count+" / "+it.target+"</span></span>";
         }
+      }else if(it.juz){
+        if(editable){
+          /* Manual juz for this day (1\u201330). Stored in the check-in's count
+             field, together with done, for this person and date only. */
+          h+='<label class="juzpick">Juz reached<select data-juz="1" data-p="'+esc(person)+
+             '" data-item="'+it.id+'" data-date="'+ds+'" aria-label="Juz reached">';
+          h+='<option value="0"'+(count===0?" selected":"")+'>\u2014</option>';
+          for(var jz=1;jz<=30;jz++) h+='<option value="'+jz+'"'+(count===jz?" selected":"")+'>Juz '+jz+'</option>';
+          h+="</select></label>";
+        }else{
+          h+='<span class="ro-mark">'+(done?'<span class="done-mark">\u2713 Done</span>':'<span class="notdone">Not done</span>')+
+             (count>0?'<span class="cnt">Juz '+count+"</span>":"")+"</span>";
+        }
       }else if(!editable){
         h+='<span class="ro-mark">'+(done?'<span class="done-mark">\u2713 Done</span>':'<span class="notdone">Not done</span>')+"</span>";
       }
@@ -768,11 +1085,13 @@
           ? "Admin mode is on \u2014 changes you make here are saved as corrections."
           : "Admin mode is off \u2014 this checklist is read-only. Turn Admin on (top right) to correct an entry.")+"</p>";
       h+="<h2 class=\"sec\">Last 7 days</h2>";
-      h+='<div class="strip">';
+      h+='<div class="days-btn-container" role="radiogroup" aria-label="Choose a day">';
       for(var i=6;i>=0;i--){
         var dd=addDays(d,-i), m=cellMark(p,dd);
-        h+='<div class="'+(dstr(dd)===dstr(d)?"sel":"")+'"><span class="d">'+DOW_S[(dd.getDay()+6)%7]+" "+dd.getDate()+
-           '</span><span class="'+m.cls+'">'+(m.txt||"\u00b7")+"</span></div>";
+        h+='<label class="daypick"><input class="day-btn" type="radio" name="daystrip" data-daypick="1" value="'+dstr(dd)+'"'+
+           (dstr(dd)===dstr(d)?" checked":"")+' aria-label="'+esc(fmtDate(dd))+'">'+
+           '<span class="day-label" aria-hidden="true">'+DOW_S[(dd.getDay()+6)%7].charAt(0)+"</span>"+
+           '<span class="day-meta">'+dd.getDate()+' <span class="'+m.cls+'">'+(m.txt||"\u00b7")+"</span></span></label>";
       }
       h+="</div>";
       h+="<h2 class=\"sec\">Checklist \u2014 "+fmtDate(d)+"</h2>";
@@ -807,7 +1126,20 @@
       });
       h+="</tbody></table></div>";
       h+='<p class="scroll-hint">Tap a name to open that person\u2019s checklist.</p>';
-      h+='<p class="note" style="padding:0 4px;">\u2713 = all items done that day. A fraction such as 9/17 = items done out of items due. \u2014 in red = a past day with nothing recorded.</p>';
+      h+="<h2 class=\"sec\">Günlük Hatmi Quran \u2014 juz reached each day</h2>";
+      h+='<div class="tablebox" tabindex="0" role="region" aria-label="Günlük Hatmi Quran juz table"><table class="ledger"><thead><tr><th class="person" scope="col">Person</th>';
+      for(var i2=0;i2<7;i2++){ var dh2=addDays(ws,i2);
+        h+='<th scope="col">'+DOW_S[i2]+"<small>"+dh2.getDate()+" "+MON_S[dh2.getMonth()]+"</small></th>"; }
+      h+="</tr></thead><tbody>";
+      visibleMembers().forEach(function(p){
+        h+="<tr>"+personCell(p,"");
+        for(var j2=0;j2<7;j2++){ var d3=addDays(ws,j2), rr=getCI(p,dstr(d3),"gunlukhatmi");
+          h+='<td class="'+(rr&&rr.done?"done-cell":"")+'">'+juzCell(p,d3)+"</td>"; }
+        h+="</tr>";
+      });
+      h+="</tbody></table></div>";
+      h+='<p class="note" style="padding:0 4px;">The juz is entered by each person for that day. \u2014 = no juz entered for that day.</p>';
+      h+='<p class="note" style="padding:0 4px;">\u2713 = all items done that day. A fraction such as 2/3 = items done out of items due. \u2014 in red = a past day with nothing recorded.</p>';
       h+='<p class="cta"><button class="primary" data-act="export-xlsx">Export this week to Excel</button></p>';
       return h;
     }
@@ -859,13 +1191,37 @@
             '<div class="rowflex"><button data-act="admin-off">Turn admin off</button></div>'
           : '<p class="note" style="margin:0 0 8px;">Only this Admin profile can correct entries. Enter the admin PIN to correct a past entry. If no admin PIN has been set yet, the PIN you enter becomes the admin PIN.</p>'+
             '<form id="admin-form" class="rowflex"><input name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="4-digit PIN" autocomplete="off" style="width:150px;">'+
-            '<button class="primary" type="submit">Continue</button></form>')+
+            uiBtn("Continue",'type="submit"')+'</form>')+
         '<div class="err" id="admin-err"></div></div>';
+    }
+
+    /* --- Primary submit button — plain dark-green "Continue" button ---
+       Full-width, white "Continue" text centred, as in the reference
+       screenshot. Replaces the previous Uiverse spin button. */
+    function uiBtn(label, attrs){
+      return '<button class="continue-btn" '+attrs+'>'+esc(label)+'</button>';
+    }
+
+    /* --- "loading" loader (Uiverse.io by andrew-manzyk) ---
+       9 clipped slices; each slice holds the word "loading" in a scrolling
+       span, plus the wobble line. Loading screen only — no FAYSALABAD text
+       here. The login screen below shows FAYSALABAD as plain text, not
+       this markup. */
+    function loaderMarkup(){
+      var h='<div class="loader" role="img" aria-label="loading">';
+      for(var i=0;i<9;i++) h+='<div class="text" aria-hidden="true"><span>loading</span></div>';
+      h+='<div class="line" aria-hidden="true"></div></div>';
+      return h;
+    }
+    /* --- Loading screen: dark Jet Black, white loader, no button.
+       Shows for exactly 2 seconds, then render() moves on by itself. --- */
+    function loaderView(){
+      return '<div class="loadscreen">'+loaderMarkup()+"</div>";
     }
 
     /* --- Identity setup --- */
     function setupView(){
-      var h='<div class="setup"><div class="setup-badge" aria-hidden="true">\u2713</div><h1>Daily Ibadah Tracker</h1>'+
+      var h='<div class="setup"><div class="setup-brand">FAYSALABAD</div><h1>Choose your name</h1>'+
         "<p>Choose your name and enter your 4-digit PIN. First time? The PIN you enter becomes your PIN for this name. This device remembers you — your checklist is shared live with the group.</p>"+
         '<div class="namelist" role="listbox" aria-label="Choose your name">';
       PEOPLE.forEach(function(p){
@@ -873,7 +1229,7 @@
       });
       h+='</div><form id="setup-form"><div class="pinrow">'+
          '<input id="setup-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="\u2022 \u2022 \u2022 \u2022" autocomplete="off" enterkeyhint="go" aria-label="4-digit PIN">'+
-         '<button class="primary" type="submit">Continue</button></div>'+
+         uiBtn("Continue",'type="submit"')+'</div>'+
          '<div class="err">'+esc(state.setupMsg)+"</div></form>"+
          '<p class="note" style="text-align:center;margin-top:auto;padding-top:24px;">5 members + Admin \u00b7 Shared live \u00b7 Admin oversees only, no checklist</p></div>';
       return h;
@@ -906,11 +1262,31 @@
         var ds=dstr(state.selDate), r=getCI(person,ds,item.id);
         var count=r?(r.count||0):0, done=r?!!r.done:false;
         if(act==="toggle"){ if(item.target){ setCheck(person,ds,item, !done, done?0:item.target); }
+          else if(item.juz){ setCheck(person,ds,item,!done,count); }
           else setCheck(person,ds,item,!done,0); }
         else if(act==="inc") setCheck(person,ds,item,false,count+1);
         else if(act==="dec") setCheck(person,ds,item,false,count-1);
         else if(act==="incby") setCheck(person,ds,item,false,count+parseInt(el.getAttribute("data-n"),10));
       }
+    });
+    /* Juz picker (Günlük Hatmi Quran only): choosing a juz marks that day's
+       hatmi done and stores the juz with the check-in; \u2014 clears the juz. */
+    document.addEventListener("change",function(e){
+      /* Day selector (person view, Last 7 days): picking a day loads that
+         day's checklist below. */
+      var dp=e.target && e.target.closest ? e.target.closest("[data-daypick]") : null;
+      if(dp){ state.selDate=parseD(dp.value); ensureRange(state.selDate).then(render); render(); return; }
+      var el=e.target && e.target.closest ? e.target.closest("[data-juz]") : null;
+      if(!el) return;
+      var person=el.getAttribute("data-p"), item=ITEM_BY_ID[el.getAttribute("data-item")];
+      if(!item || !item.juz){ return; }
+      if(!canEdit(person)){ render(); return; }
+      var ds=el.getAttribute("data-date")||dstr(state.selDate);
+      var juz=Math.max(0,Math.min(30,parseInt(el.value,10)||0));
+      var r=getCI(person,ds,item.id);
+      var done=r?!!r.done:false;
+      if(juz>0) done=true;
+      setCheck(person,ds,item,done,juz);
     });
     document.addEventListener("submit",function(e){
       if(e.target.id==="setup-form"){
@@ -985,15 +1361,28 @@
           render();
           /* Realtime: other people's updates appear without a refresh. */
           try{
+            /* Non-privileged members subscribe with a server-side Realtime
+               filter, so other members' rows are never delivered to their
+               browser at all (their REST loads are filtered the same way in
+               loadCheckins / loadActivity). Fikri Abi and Admin, who may see
+               everyone, subscribe unfiltered. The handler guard below stays
+               as a second layer. */
+            var rtOwn = state.me && !canSeeAllTables();
+            var rtCheckins = rtOwn
+              ? {event:"*",schema:"public",table:"checkins",filter:"person=eq."+state.me}
+              : {event:"*",schema:"public",table:"checkins"};
+            var rtActivity = rtOwn
+              ? {event:"*",schema:"public",table:"activity",filter:"person=eq."+state.me}
+              : {event:"*",schema:"public",table:"activity"};
             sb.channel("ibadah-live")
-              .on("postgres_changes",{event:"*",schema:"public",table:"checkins"},function(payload){
+              .on("postgres_changes",rtCheckins,function(payload){
                 if(payload.new && payload.new.person){
                   if(state.me && !canSeePerson(payload.new.person)) return;
                   mergeRow(payload.new);
                 }
                 render();
               })
-              .on("postgres_changes",{event:"*",schema:"public",table:"activity"},function(){
+              .on("postgres_changes",rtActivity,function(){
                 loadActivity().then(render);
               })
               .subscribe();
@@ -1008,6 +1397,10 @@
         render();
       });
     }
+    /* The loading screen lasts exactly 2 seconds, then the app moves on
+       by itself — to the name picker, or into the tracker when this device
+       already remembers who is signed in. */
+    setTimeout(function(){ state.loaderDone=true; render(); }, 2000);
     boot();
     </script>
   </body>
