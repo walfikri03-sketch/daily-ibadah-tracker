@@ -391,14 +391,18 @@
         state.lastUpdated[row.person] = row.updated_at;
     }
     function loadCheckins(from,to){
-      return sb.from("checkins").select("*").gte("check_date",from).lte("check_date",to)
-        .then(function(res){
+      var q = sb.from("checkins").select("*").gte("check_date",from).lte("check_date",to);
+      /* Non-privileged members only ever fetch their own rows. */
+      if(state.me && !canSeeAllTables()) q = q.eq("person", state.me);
+      return q.then(function(res){
           if(res.error){ noteError(res.error); return; }
           (res.data||[]).forEach(mergeRow);
         }).catch(function(e){ /* offline: keep what we have */ });
     }
     function loadLastUpdated(){
-      return sb.from("checkins").select("person,updated_at").order("updated_at",{ascending:false}).limit(400)
+      var q = sb.from("checkins").select("person,updated_at");
+      if(state.me && !canSeeAllTables()) q = q.eq("person", state.me);
+      return q.order("updated_at",{ascending:false}).limit(400)
         .then(function(res){
           if(res.error){ noteError(res.error); return; }
           (res.data||[]).forEach(function(r){
@@ -407,7 +411,9 @@
         }).catch(function(){});
     }
     function loadActivity(){
-      return sb.from("activity").select("*").order("created_at",{ascending:false}).limit(40)
+      var q = sb.from("activity").select("*");
+      if(state.me && !canSeeAllTables()) q = q.eq("person", state.me);
+      return q.order("created_at",{ascending:false}).limit(40)
         .then(function(res){
           if(res.error){ noteError(res.error); return; }
           state.activity = res.data||[];
@@ -420,6 +426,24 @@
 
     /* ============ Editing ============ */
     function canEdit(person){ return state.me===person || (state.admin && state.me===ADMIN_PERSON); }
+    /* Table visibility: only Fikri Abi and Admin can see everyone's Today /
+       Week tables. Every other member sees only their own row / status. */
+    function canSeeAllTables(){ return state.me==="Fikri Abi" || state.me===ADMIN_PERSON; }
+    function visibleMembers(){
+      if(!state.me || canSeeAllTables()) return MEMBERS.slice();
+      return MEMBERS.indexOf(state.me)>=0 ? [state.me] : MEMBERS.slice();
+    }
+    function canSeePerson(person){ return canSeeAllTables() || person===state.me; }
+    /* Drop any already-loaded rows a non-privileged member may not see
+       (e.g. fetched before sign-in, or after switching accounts). */
+    function purgeHidden(){
+      if(!state.me || canSeeAllTables()) return;
+      Object.keys(state.checkins).forEach(function(k){
+        if(state.checkins[k].person!==state.me) delete state.checkins[k]; });
+      Object.keys(state.lastUpdated).forEach(function(p){
+        if(p!==state.me) delete state.lastUpdated[p]; });
+      state.activity = state.activity.filter(function(a){ return a.person===state.me; });
+    }
     function oldValText(row,item){
       if(!row) return "not done";
       if(item.target) return (row.count||0)+"/"+item.target;
@@ -545,7 +569,7 @@
     }
     function statusBox(mode, refDate){
       var h='<div class="statusbox" aria-label="'+(mode==="week"?"Who has done this week":"Who has done today")+'">';
-      MEMBERS.forEach(function(p){
+      visibleMembers().forEach(function(p){
         var s = mode==="week" ? weekStatus(p,refDate) : dayStatus(p,refDate);
         h+='<button class="status-row" data-act="open-person" data-p="'+esc(p)+'">'+
           '<span class="avatar" aria-hidden="true">'+esc(p.charAt(0))+'</span>'+
@@ -569,6 +593,10 @@
         if(state.view==="mine") state.view="today";
         if(state.view==="person" && state.personView===ADMIN_PERSON) state.view="today";
       }
+      /* Visibility guard: only Fikri Abi and Admin may open another member's
+         page. Anyone else asking for someone else's page lands on Today,
+         which for them shows only their own row. */
+      if(state.view==="person" && state.personView && !canSeePerson(state.personView)) state.view="today";
       var h = topbar();
       h += '<div class="wrap">';
       if(!state.online || state.queue.length) h += offlineBanner();
@@ -638,8 +666,9 @@
       var d=state.selDate, ds=dstr(d), items=dueItems(d);
       var h=dateNav();
       h+='<div style="margin-top:12px;"><span class="viewtag today">Today \u00b7 one day</span></div>';
-      h+="<h2 class=\"sec\" style=\"margin-top:6px;\">Who has done today?</h2>";
+      h+="<h2 class=\"sec\" style=\"margin-top:6px;\">"+(canSeeAllTables()?"Who has done today?":"Have you done today?")+"</h2>";
       h+='<p class="note" style="margin:-4px 0 10px;">Status for '+fmtDate(d)+' only. For the whole week, open the Week tab.</p>';
+      if(!canSeeAllTables()) h+='<p class="note" style="margin:-4px 0 10px;">You can only see your own table. Only Fikri Abi and Admin can see everyone\u2019s table.</p>';
       h+=statusBox("today", d);
       h+="<h2 class=\"sec\">Detail \u2014 item by item</h2>";
       if(!items.length){
@@ -648,7 +677,7 @@
         h+='<div class="tablebox" tabindex="0" role="region" aria-label="Today ledger table — scroll sideways inside the table for all items"><table class="ledger"><thead><tr><th class="person" scope="col">Person</th>';
         items.forEach(function(it){ h+='<th scope="col">'+esc(it.code)+"</th>"; });
         h+='<th class="total" scope="col">Total</th></tr></thead><tbody>';
-        MEMBERS.forEach(function(p){
+        visibleMembers().forEach(function(p){
           var st=dayStats(p,d);
           var pct=st.total?Math.round(st.frac*100):0;
           h+="<tr>"+personCell(p, state.lastUpdated[p]?"Updated "+fmtTime(state.lastUpdated[p]):"No entries yet");
@@ -667,10 +696,11 @@
       else
         h+='<p class="cta"><button class="primary" data-act="tab" data-v="mine">Open my checklist</button></p>';
       h+="<h2 class=\"sec\">Recent activity</h2>";
-      if(!state.activity.length) h+='<div class="empty">No activity yet. Completed items will appear here.</div>';
+      var visibleActivity = canSeeAllTables() ? state.activity : state.activity.filter(function(a){ return a.person===state.me; });
+      if(!visibleActivity.length) h+='<div class="empty">No activity yet. Completed items will appear here.</div>';
       else{
         h+='<div class="feed">';
-        state.activity.slice(0,25).forEach(function(a){
+        visibleActivity.slice(0,25).forEach(function(a){
           h+='<div><span class="fdot"></span><span style="flex:1;"><strong>'+esc(a.person)+'</strong> '+esc(a.action)+' '+esc(a.item_name)+'</span><span class="t">'+esc(fmtTime(a.created_at))+"</span></div>";
         });
         h+="</div>";
@@ -757,15 +787,16 @@
         '<div class="center"><span class="date">Week of '+ws.getDate()+" "+MON_S[ws.getMonth()]+'</span><span class="sub">'+fmtDate(ws)+" \u2013 "+fmtDate(addDays(ws,6))+'</span></div>'+
         '<button class="navbtn" data-act="next-week" aria-label="Next week">\u203a</button></div>';
       h+='<div style="margin-top:12px;"><span class="viewtag week">Week \u00b7 7 days</span></div>';
-      h+="<h2 class=\"sec\" style=\"margin-top:6px;\">Who has done this week?</h2>";
+      h+="<h2 class=\"sec\" style=\"margin-top:6px;\">"+(canSeeAllTables()?"Who has done this week?":"Have you done this week?")+"</h2>";
       h+='<p class="note" style="margin:-4px 0 10px;">Status for the whole week, '+fmtDate(ws)+" \u2013 "+fmtDate(addDays(ws,6))+'. For a single day, open the Today tab.</p>';
+      if(!canSeeAllTables()) h+='<p class="note" style="margin:-4px 0 10px;">You can only see your own table. Only Fikri Abi and Admin can see everyone\u2019s table.</p>';
       h+=statusBox("week", ws);
       h+="<h2 class=\"sec\">Detail \u2014 day by day</h2>";
       h+='<div class="tablebox" tabindex="0" role="region" aria-label="Week ledger table"><table class="ledger ledger-week"><thead><tr><th class="person" scope="col">Person</th>';
       for(var i=0;i<7;i++){ var dh=addDays(ws,i);
         h+='<th scope="col">'+DOW_S[i]+"<small>"+dh.getDate()+" "+MON_S[dh.getMonth()]+"</small></th>"; }
       h+='<th class="total" scope="col">Week</th></tr></thead><tbody>';
-      MEMBERS.forEach(function(p){
+      visibleMembers().forEach(function(p){
         var totFrac=0;
         for(var k=0;k<7;k++) totFrac+=dayStats(p,addDays(ws,k)).frac;
         var pct=Math.round(totFrac/7*100);
@@ -781,8 +812,11 @@
       return h;
     }
     function exportView(){
+      var scope = canSeeAllTables()
+        ? "the 5 members \u00d7 days, with the weekly percentage"
+        : "your row only \u2014 1 person \u00d7 days, with the weekly percentage. Other members\u2019 rows are not visible to you";
       return "<h2 class=\"sec\">Export</h2>"+
-        '<div class="empty" style="color:var(--ink);">Downloads the weekly table (the 5 members \u00d7 days, with the weekly percentage) '+
+        '<div class="empty" style="color:var(--ink);">Downloads the weekly table ('+scope+') '+
         "for the week of "+fmtDate(state.weekStart)+' as an Excel file.<br><br>'+
         '<button class="primary" data-act="export-xlsx">Export weekly table to Excel</button></div>';
     }
@@ -792,7 +826,7 @@
       for(i=0;i<7;i++){ dd=addDays(ws,i); head.push(DOW_S[i]+" "+dd.getDate()+" "+MON_S[dd.getMonth()]); }
       head.push("Weekly %");
       var rows=[head];
-      MEMBERS.forEach(function(p){
+      visibleMembers().forEach(function(p){
         var row=[p], tot=0;
         for(var i=0;i<7;i++){ var d2=addDays(ws,i), m=cellMark(p,d2);
           tot+=dayStats(p,d2).frac;
@@ -858,6 +892,7 @@
       else if(act==="next-week"){ state.weekStart=addDays(state.weekStart,7); ensureRange(state.weekStart).then(render); render(); }
       else if(act==="open-person"){ var pp=el.getAttribute("data-p");
         if(pp===ADMIN_PERSON){ state.view="today"; render(); return; }
+        if(!canSeePerson(pp)){ state.view="today"; render(); return; }
         state.personView=pp; state.view="person"; render(); }
       else if(act==="pick-name"){ state.setupName=el.getAttribute("data-p"); state.setupMsg=""; render(); var inp=document.getElementById("setup-pin"); if(inp) inp.focus(); }
       else if(act==="switch"){ try{localStorage.removeItem("ibadah-identity");}catch(err){}
@@ -925,6 +960,7 @@
     });
     function finishSetup(person){
       state.me=person;
+      purgeHidden();
       if(person!==ADMIN_PERSON){ state.admin=false; state.adminPanel=false; }
       try{ localStorage.setItem("ibadah-identity", JSON.stringify({person:person})); }catch(e){}
       state.view="today"; state.setupMsg="";
@@ -951,7 +987,10 @@
           try{
             sb.channel("ibadah-live")
               .on("postgres_changes",{event:"*",schema:"public",table:"checkins"},function(payload){
-                if(payload.new && payload.new.person) mergeRow(payload.new);
+                if(payload.new && payload.new.person){
+                  if(state.me && !canSeePerson(payload.new.person)) return;
+                  mergeRow(payload.new);
+                }
                 render();
               })
               .on("postgres_changes",{event:"*",schema:"public",table:"activity"},function(){
